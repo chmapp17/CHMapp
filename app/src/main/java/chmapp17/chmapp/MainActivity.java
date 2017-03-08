@@ -20,11 +20,11 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_home:
                     mTextMessage.setText(R.string.title_home);
                     return true;
-                case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
+                case R.id.navigation_viewcrimes:
+                    mTextMessage.setText(R.string.title_viewcrimes);
                     return true;
-                case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
+                case R.id.navigation_addcrime:
+                    mTextMessage.setText(R.string.title_addcrime);
                     return true;
             }
             return false;
