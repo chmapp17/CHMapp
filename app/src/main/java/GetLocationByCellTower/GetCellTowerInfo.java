@@ -4,10 +4,17 @@ package GetLocationByCellTower;
  * Created by Edward on 3/11/2017.
  */
 import android.content.Context;
-import android.telephony.TelephonyManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import android.telephony.*;
+
+import android.telephony.CellIdentityGsm;
+import android.telephony.CellIdentityLte;
+import android.telephony.CellInfo;
+import android.telephony.CellInfoGsm;
+import android.telephony.CellInfoLte;
+import android.telephony.CellSignalStrengthGsm;
+import android.telephony.CellSignalStrengthLte;
+import android.telephony.TelephonyManager;
 import java.util.List;
 
 public class GetCellTowerInfo {
@@ -15,7 +22,6 @@ public class GetCellTowerInfo {
     public static JSONArray getCellInfo(Context ctx){
 
         TelephonyManager tel = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
-
         JSONArray cellList = new JSONArray();
 
         // Type of the network

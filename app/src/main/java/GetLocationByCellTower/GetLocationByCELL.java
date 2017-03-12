@@ -2,40 +2,25 @@ package GetLocationByCellTower;
 
 
 import android.content.Context;
-import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
-import GetLocationByCellTower.GetCellTowerInfo;
-import chmapp17.chmapp.R;
 
 public class GetLocationByCELL{
 
     private static final int LATITUDE = 0;
     private static final int LONGITUDE = 1;
     private static final String url_google_api = "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyCXbCzfN-SOfqLoivudw8GbQcR2WdvABF4";
-    private double _lat = 0,_lng=0;
-    private JSONObject JResponse;
+
 
     public double [] GetLocation(Context _ctx)
     {
@@ -43,9 +28,13 @@ public class GetLocationByCELL{
         GetCellTowerInfo  twr = new GetCellTowerInfo();
 
         JSONArray js = twr.getCellInfo(_ctx);
-        SendRequest(js);
+        final JSONObject toPost = new JSONObject();
 
         try {
+            toPost.put("cellTowers", js);
+            String msg = getServerResponse(toPost);
+            JSONObject JResponse = new JSONObject(msg);
+
             JSONObject location = JResponse.getJSONObject("location");
             param_loc[LATITUDE] = location.getDouble("lat");
             param_loc[LONGITUDE] = location.getDouble("lng");
@@ -81,7 +70,6 @@ public class GetLocationByCELL{
                     sb.append(line + "\n");
                 }
                 br.close();
-                //System.out.println("" + sb.toString());
                 result = sb.toString();
             }
             con.disconnect();
@@ -93,19 +81,6 @@ public class GetLocationByCELL{
             e.printStackTrace();
         }
         return result;
-    }
-
-    private void SendRequest(JSONArray js) {
-
-        try {
-            final JSONObject toPost = new JSONObject();
-            toPost.put("cellTowers", js);
-            String msg = getServerResponse(toPost);
-            JResponse = new JSONObject(msg);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 }
 
