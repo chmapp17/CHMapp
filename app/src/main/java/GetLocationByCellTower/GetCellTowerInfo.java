@@ -51,8 +51,7 @@ public class GetCellTowerInfo {
                 }
 
             } catch (Exception ex) {
-
-
+                ex.printStackTrace();
             }
         }
 

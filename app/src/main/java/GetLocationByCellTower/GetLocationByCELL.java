@@ -29,30 +29,23 @@ import java.net.URL;
 import GetLocationByCellTower.GetCellTowerInfo;
 import chmapp17.chmapp.R;
 
-public class GetLocationByCELL extends AppCompatActivity {
+public class GetLocationByCELL{
 
     private static final int LATITUDE = 0;
     private static final int LONGITUDE = 1;
+    private static final String url_google_api = "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyCXbCzfN-SOfqLoivudw8GbQcR2WdvABF4";
     private double _lat = 0,_lng=0;
     private JSONObject JResponse;
-    private String url_google_api = "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyCXbCzfN-SOfqLoivudw8GbQcR2WdvABF4";
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_get_location_by_cell);
-
-    }
     public double [] GetLocation(Context _ctx)
     {
         double [] param_loc = new double[2];
         GetCellTowerInfo  twr = new GetCellTowerInfo();
 
         JSONArray js = twr.getCellInfo(_ctx);
-        SendRequest(js,_ctx);
+        SendRequest(js);
 
         try {
-
             JSONObject location = JResponse.getJSONObject("location");
             param_loc[LATITUDE] = location.getDouble("lat");
             param_loc[LONGITUDE] = location.getDouble("lng");
@@ -60,8 +53,8 @@ public class GetLocationByCELL extends AppCompatActivity {
             e.printStackTrace();
         }
         return param_loc;
-
     }
+
     private String getServerResponse(JSONObject toPost) {
 
         String result = "";
@@ -91,9 +84,7 @@ public class GetLocationByCELL extends AppCompatActivity {
                 //System.out.println("" + sb.toString());
                 result = sb.toString();
             }
-
             con.disconnect();
-            //return result;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ProtocolException e) {
@@ -102,10 +93,9 @@ public class GetLocationByCELL extends AppCompatActivity {
             e.printStackTrace();
         }
         return result;
-
     }
 
-    private void SendRequest(JSONArray js, Context _ctx) {
+    private void SendRequest(JSONArray js) {
 
         try {
             final JSONObject toPost = new JSONObject();
