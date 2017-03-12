@@ -4,4 +4,7 @@
     <string name="title_viewcrimes">View crimes</string>
     <string name="title_addcrime">Add crime</string>
     <string name="title_activity_view_crimes_fragment">Map</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -1,24 +1,58 @@
 package chmapp17.chmapp;
 
+import android.Manifest;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
-public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback {
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import GetLocationByCellTower.GetLocationByCELL;
+
+public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleMap.OnMarkerDragListener,
+        GoogleMap.OnMapLongClickListener,
+        View.OnClickListener {
+    private static final int LATITUDE = 0;
+    private static final int LONGITUDE = 1;
+
+    Context ctx;
     private GoogleMap mMap;
+    private double _longitude = 26.246355;
+    private double _latitude = 47.641546;
+
+    //Buttons
+
+    private ImageButton buttonSave;
+    private ImageButton buttonCurrent;
+    private ImageButton buttonView;
+
+    //Google ApiClient
+    private GoogleApiClient googleApiClient;
     private FragmentActivity myContext = new FragmentActivity();
 
     @Override
@@ -29,11 +63,13 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
-        SupportMapFragment mapFragment = (SupportMapFragment)getChildFragmentManager()
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
         //getView().setBackgroundColor(Color.CYAN);
     }
 
@@ -48,13 +84,72 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback {
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap = googleMap;
+        double[] loc = new double[2];
+        final GetLocationByCELL LocByCell = new GetLocationByCELL();
+        new AsyncTask<Void, Void, double[]>() {
+            @Override
+            protected double[] doInBackground(Void... voids) {
+
+
+                return LocByCell.GetLocation(getActivity());
+            }
+
+            @Override
+            protected void onPostExecute(double[] loc) {
+                _latitude = loc[LATITUDE];
+                _longitude = loc[LONGITUDE];
+                String msg = _latitude + ", " + _longitude;
+
+                // Add a marker in Sydney and move the camera
+                LatLng location_position = new LatLng(_latitude, _longitude);
+                mMap.addMarker(new MarkerOptions().position(location_position).title("Marker")).setDraggable(true);
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(location_position));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+                Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
+            }
+        }.execute();
     }
 
+    @Override
+    public void onClick(View v) {
 
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+
+    }
 }
+
