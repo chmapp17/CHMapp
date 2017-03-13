@@ -1,12 +1,10 @@
-package GetLocationByCellTower;
+package chmapp17.chmapp;
 
 /**
  * Created by Edward on 3/11/2017.
  */
-import android.content.Context;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
+import android.content.Context;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityLte;
 import android.telephony.CellInfo;
@@ -15,14 +13,18 @@ import android.telephony.CellInfoLte;
 import android.telephony.CellSignalStrengthGsm;
 import android.telephony.CellSignalStrengthLte;
 import android.telephony.TelephonyManager;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.List;
 
 public class GetCellTowerInfo {
 
-    public static JSONArray getCellInfo(Context ctx){
+    public static JSONArray getCellTowerObjects(Context ctx){
 
         TelephonyManager tel = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
-        JSONArray cellList = new JSONArray();
+        JSONArray cellTowers = new JSONArray();
 
         // Type of the network
         int phoneTypeInt = tel.getPhoneType();
@@ -44,7 +46,7 @@ public class GetCellTowerInfo {
                     cellObj.put("mobileCountryCode", identityGsm.getMcc());
                     cellObj.put("mobileNetworkCode", identityGsm.getMnc());
                     cellObj.put("signalStrength", gsm.getDbm());
-                    cellList.put(cellObj);
+                    cellTowers.put(cellObj);
                 } else if (info instanceof CellInfoLte) {
                     CellSignalStrengthLte lte = ((CellInfoLte) info).getCellSignalStrength();
                     CellIdentityLte identityLte = ((CellInfoLte) info).getCellIdentity();
@@ -53,7 +55,7 @@ public class GetCellTowerInfo {
                     cellObj.put("mobileCountryCode", identityLte.getMcc());
                     cellObj.put("mobileNetworkCode", identityLte.getMnc());
                     cellObj.put("signalStrength", lte.getDbm());
-                    cellList.put(cellObj);
+                    cellTowers.put(cellObj);
                 }
 
             } catch (Exception ex) {
@@ -61,6 +63,6 @@ public class GetCellTowerInfo {
             }
         }
 
-        return cellList;
+        return cellTowers;
     }
 }

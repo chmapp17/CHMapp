@@ -1,14 +1,17 @@
 package chmapp17.chmapp;
 
-import android.Manifest;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -20,17 +23,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import GetLocationByCellTower.GetLocationByCELL;
-
 public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -41,7 +33,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     private static final int LONGITUDE = 1;
 
     Context ctx;
-    private GoogleMap mMap;
+    private GoogleMap viewcMap;
     private double _longitude = 26.246355;
     private double _latitude = 47.641546;
 
@@ -66,11 +58,8 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     public void onStart() {
         super.onStart();
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(R.id.viewcmap);
         mapFragment.getMapAsync(this);
-
-
-        //getView().setBackgroundColor(Color.CYAN);
     }
 
     /**
@@ -85,15 +74,14 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        mMap = googleMap;
+        viewcMap = googleMap;
         double[] loc = new double[2];
-        final GetLocationByCELL LocByCell = new GetLocationByCELL();
+        final GeoLocation geoLocation = new GeoLocation();
         new AsyncTask<Void, Void, double[]>() {
             @Override
             protected double[] doInBackground(Void... voids) {
 
-
-                return LocByCell.GetLocation(getActivity());
+                return geoLocation.GetLocation(getActivity());
             }
 
             @Override
@@ -104,9 +92,9 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
 
                 // Add a marker in Sydney and move the camera
                 LatLng location_position = new LatLng(_latitude, _longitude);
-                mMap.addMarker(new MarkerOptions().position(location_position).title("Marker")).setDraggable(true);
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(location_position));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+                viewcMap.addMarker(new MarkerOptions().position(location_position).title("Marker")).setDraggable(true);
+                viewcMap.moveCamera(CameraUpdateFactory.newLatLng(location_position));
+                viewcMap.animateCamera(CameraUpdateFactory.zoomTo(15));
                 Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
             }
         }.execute();
