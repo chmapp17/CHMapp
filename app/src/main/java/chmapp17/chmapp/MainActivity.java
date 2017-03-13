@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Fragment fragment;
     private FragmentManager fragmentManager;
+    private FragmentTransaction transaction;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -21,17 +22,27 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    fragment = new HomeFragment();
+                    if(fragmentManager.findFragmentByTag("home") == null) {
+                        fragment = new HomeFragment();
+                        transaction = fragmentManager.beginTransaction();
+                        transaction.replace(R.id.content, fragment, "home").commit();
+                    }
                     break;
                 case R.id.navigation_viewcrimes:
-                    fragment = new ViewCrimesFragment();
+                    if(fragmentManager.findFragmentByTag("viewc") == null) {
+                        fragment = new ViewCrimesFragment();
+                        transaction = fragmentManager.beginTransaction();
+                        transaction.replace(R.id.content, fragment, "viewc").commit();
+                    }
                     break;
                 case R.id.navigation_addcrime:
-                    fragment = new AddCrimeFragment();
+                    if(fragmentManager.findFragmentByTag("addc") == null) {
+                        fragment = new AddCrimeFragment();
+                        transaction = fragmentManager.beginTransaction();
+                        transaction.replace(R.id.content, fragment, "addc").commit();
+                    }
                     break;
             }
-            final FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.content, fragment).commit();
             return true;
         }
 
@@ -51,8 +62,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         fragment = new HomeFragment();
-        final FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.content, fragment).commit();
+        transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.content, fragment, "home").commit();
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.getMenu().findItem(R.id.navigation_home).setChecked(true);
     }
-
 }
