@@ -1,6 +1,6 @@
 package chmapp17.chmapp;
 
-import android.content.Context;
+import android.support.v4.app.FragmentActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,14 +21,14 @@ public class GeoLocation {
     private final int LONG = 1;
     private String url_google_api = "https://www.googleapis.com/geolocation/v1/geolocate?key=";
 
-    public double[] GetLocation(Context context) {
-        url_google_api += context.getString(R.string.google_maps_key);
+    public double[] GetLocation(FragmentActivity activity) {
+        url_google_api += activity.getString(R.string.google_maps_key);
         double[] param_loc = new double[2];
 
         GetCellTowerInfo cellTowerInfo = new GetCellTowerInfo();
-        JSONArray CTobj = cellTowerInfo.getCellTowerObjects(context);
+        JSONArray CTobj = cellTowerInfo.getCellTowerObjects(activity);
         GetWiFiInfo wiFiInfo = new GetWiFiInfo();
-        JSONArray APobj = wiFiInfo.getAccessPointObjects(context);
+        JSONArray APobj = wiFiInfo.getAccessPointObjects(activity);
         final JSONObject toPost = new JSONObject();
 
         try {
@@ -36,7 +36,6 @@ public class GeoLocation {
             toPost.put("wifiAccessPoints", APobj);
             String msg = getServerResponse(toPost);
             JSONObject JResponse = new JSONObject(msg);
-
             JSONObject location = JResponse.getJSONObject("location");
             param_loc[LAT] = location.getDouble("lat");
             param_loc[LONG] = location.getDouble("lng");

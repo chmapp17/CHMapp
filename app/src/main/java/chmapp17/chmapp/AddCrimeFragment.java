@@ -24,16 +24,14 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     private double longitude = 0;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_add_crime, container, false);
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.addcmap);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.addcmap);
         mapFragment.getMapAsync(this);
     }
 
@@ -44,7 +42,6 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
         new AsyncTask<Void, Void, double[]>() {
             @Override
             protected double[] doInBackground(Void... voids) {
-
                 return geoLocation.GetLocation(getActivity());
             }
 

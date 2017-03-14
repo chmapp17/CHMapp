@@ -21,7 +21,7 @@ import java.util.List;
 
 public class GetCellTowerInfo {
 
-    public static JSONArray getCellTowerObjects(Context ctx){
+    public static JSONArray getCellTowerObjects(Context ctx) {
 
         TelephonyManager tel = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
         JSONArray cellTowers = new JSONArray();
@@ -34,11 +34,11 @@ public class GetCellTowerInfo {
 
         //from Android M up must use getAllCellInfo
         List<CellInfo> infos = tel.getAllCellInfo();
-        for (int i = 0; i<infos.size(); ++i) {
+        for (int i = 0; i < infos.size(); ++i) {
             try {
                 JSONObject cellObj = new JSONObject();
                 CellInfo info = infos.get(i);
-                if (info instanceof CellInfoGsm){
+                if (info instanceof CellInfoGsm) {
                     CellSignalStrengthGsm gsm = ((CellInfoGsm) info).getCellSignalStrength();
                     CellIdentityGsm identityGsm = ((CellInfoGsm) info).getCellIdentity();
                     cellObj.put("cellId", identityGsm.getCid());
