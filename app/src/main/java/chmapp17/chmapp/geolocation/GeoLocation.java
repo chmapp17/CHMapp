@@ -2,6 +2,8 @@ package chmapp17.chmapp.geolocation;
 
 import android.support.v4.app.FragmentActivity;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,13 +21,12 @@ import chmapp17.chmapp.R;
 
 public class GeoLocation {
 
-    private final int LAT = 0;
-    private final int LONG = 1;
+    private LatLng latLng;
     private String url_google_api = "https://www.googleapis.com/geolocation/v1/geolocate?key=";
 
-    public double[] GetLocation(FragmentActivity activity) {
+    public LatLng GetLocation(FragmentActivity activity) {
+
         url_google_api += activity.getString(R.string.google_maps_key);
-        double[] param_loc = new double[2];
 
         GetCellTowerInfo cellTowerInfo = new GetCellTowerInfo();
         JSONArray CTobj = cellTowerInfo.getCellTowerObjects(activity);
@@ -39,12 +40,11 @@ public class GeoLocation {
             String msg = getServerResponse(toPost);
             JSONObject JResponse = new JSONObject(msg);
             JSONObject location = JResponse.getJSONObject("location");
-            param_loc[LAT] = location.getDouble("lat");
-            param_loc[LONG] = location.getDouble("lng");
+            latLng = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return param_loc;
+        return latLng;
     }
 
     private String getServerResponse(JSONObject toPost) {

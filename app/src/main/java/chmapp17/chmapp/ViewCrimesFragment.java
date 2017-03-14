@@ -11,19 +11,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import chmapp17.chmapp.geolocation.GeoLocation;
+import chmapp17.chmapp.map.MapHandling;
 
 public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -77,27 +75,16 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     public void onMapReady(GoogleMap googleMap) {
 
         viewcMap = googleMap;
-        double[] loc = new double[2];
         final GeoLocation geoLocation = new GeoLocation();
-        new AsyncTask<Void, Void, double[]>() {
+        new AsyncTask<Void, Void, LatLng>() {
             @Override
-            protected double[] doInBackground(Void... voids) {
-
+            protected LatLng doInBackground(Void... voids) {
                 return geoLocation.GetLocation(getActivity());
             }
 
             @Override
-            protected void onPostExecute(double[] loc) {
-                _latitude = loc[LATITUDE];
-                _longitude = loc[LONGITUDE];
-                String msg = _latitude + ", " + _longitude;
-
-                // Add a marker in Sydney and move the camera
-                LatLng location_position = new LatLng(_latitude, _longitude);
-                viewcMap.addMarker(new MarkerOptions().position(location_position).title("Marker")).setDraggable(true);
-                viewcMap.moveCamera(CameraUpdateFactory.newLatLng(location_position));
-                viewcMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-                Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
+            protected void onPostExecute(LatLng latLng) {
+                MapHandling.updateMapPosition(viewcMap, latLng);
             }
         }.execute();
     }
@@ -142,4 +129,3 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
 
     }
 }
-
