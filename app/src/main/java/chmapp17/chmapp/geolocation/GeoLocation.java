@@ -1,4 +1,4 @@
-package chmapp17.chmapp;
+package chmapp17.chmapp.geolocation;
 
 import android.support.v4.app.FragmentActivity;
 
@@ -14,6 +14,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+
+import chmapp17.chmapp.R;
 
 public class GeoLocation {
 

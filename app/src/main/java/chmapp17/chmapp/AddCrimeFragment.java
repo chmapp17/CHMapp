@@ -14,6 +14,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import chmapp17.chmapp.geolocation.GeoLocation;
+
 public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
 
     private final int LAT = 0;

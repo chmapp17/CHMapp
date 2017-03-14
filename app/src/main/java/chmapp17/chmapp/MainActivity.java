@@ -1,8 +1,16 @@
 package chmapp17.chmapp;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -10,16 +18,25 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
     private Fragment fragment;
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
+    private Handler handler = new Handler();
 
-    public static final int APP_PERMISSIONS_REQCODE = 0;
-    private String[] appPermissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION};
+    public static List<ScanResult> networkList;
+    ScheduledThreadPoolExecutor sch = (ScheduledThreadPoolExecutor)
+            Executors.newScheduledThreadPool(1);
+    public static final int LOCATION_PERMISSION_REQCODE = 0;
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -64,29 +81,67 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        boolean allPermissionsGranted = true;
-        for (int grantResult : grantResults) {
-            if (requestCode == APP_PERMISSIONS_REQCODE && grantResult != PackageManager.PERMISSION_GRANTED) {
-                allPermissionsGranted = false;
-            }
-        }
-        if (allPermissionsGranted) {
-            if (fragmentManager.findFragmentByTag("home") == null) {
-                fragment = new HomeFragment();
-                transaction = fragmentManager.beginTransaction();
-                transaction.replace(R.id.content, fragment, "home").commit();
-            }
-            BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-            navigation.getMenu().findItem(R.id.navigation_home).setChecked(true);
-        } else {
-            // permissions denied
-        }
+    protected void onStart() {
+        super.onStart();
+        fragment = new HomeFragment();
+        transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.content, fragment, "home").commit();
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.getMenu().findItem(R.id.navigation_home).setChecked(true);
+        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                LOCATION_PERMISSION_REQCODE);
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        requestPermissions(appPermissions, APP_PERMISSIONS_REQCODE);
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case LOCATION_PERMISSION_REQCODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    sch.scheduleAtFixedRate(scanWiFiNetworks, 0, 30, TimeUnit.SECONDS);
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
+
+    protected Runnable scanWiFiNetworks = new Runnable() {
+        @Override
+        public void run() {
+            new AsyncTask<Void, Void, List<ScanResult>>() {
+                @Override
+                protected List<ScanResult> doInBackground(Void... voids) {
+                    final WifiManager wifiManager =
+                            (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                    if (!wifiManager.isWifiEnabled()) {
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Enabling WiFi", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        wifiManager.setWifiEnabled(true);
+                        while (!wifiManager.isWifiEnabled())
+                            try {
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                    }
+                    wifiManager.startScan();
+                    registerReceiver(new BroadcastReceiver() {
+                        @Override
+                        public void onReceive(Context context, Intent intent) {
+                            wifiManager.getScanResults();
+                        }
+                    }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+                    return wifiManager.getScanResults();
+                }
+
+                @Override
+                protected void onPostExecute(List<ScanResult> networkList) {
+                    MainActivity.networkList = networkList;
+                }
+            }.execute();
+        }
+    };
 }

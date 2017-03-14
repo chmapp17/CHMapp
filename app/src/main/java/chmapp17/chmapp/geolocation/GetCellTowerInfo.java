@@ -1,4 +1,4 @@
-package chmapp17.chmapp;
+package chmapp17.chmapp.geolocation;
 
 /**
  * Created by Edward on 3/11/2017.
