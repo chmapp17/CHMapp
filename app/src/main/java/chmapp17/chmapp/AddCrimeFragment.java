@@ -44,7 +44,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
 
             @Override
             protected void onPostExecute(LatLng latLng) {
-                MapHandling.updateMapPosition(addcMap, latLng);
+                MapHandling.updateMapPosition(addcMap, latLng, geoLocation.GetAccuracy());
             }
         }.execute();
     }

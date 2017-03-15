@@ -84,7 +84,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
 
             @Override
             protected void onPostExecute(LatLng latLng) {
-                MapHandling.updateMapPosition(viewcMap, latLng);
+                MapHandling.updateMapPosition(viewcMap, latLng, geoLocation.GetAccuracy());
             }
         }.execute();
     }

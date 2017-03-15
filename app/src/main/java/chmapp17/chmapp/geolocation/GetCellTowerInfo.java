@@ -1,9 +1,5 @@
 package chmapp17.chmapp.geolocation;
 
-/**
- * Created by Edward on 3/11/2017.
- */
-
 import android.content.Context;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityLte;
@@ -21,7 +17,7 @@ import java.util.List;
 
 public class GetCellTowerInfo {
 
-    public static JSONArray getCellTowerObjects(Context ctx) {
+    public JSONArray getCellTowerObjects(Context ctx) {
 
         TelephonyManager tel = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
         JSONArray cellTowers = new JSONArray();

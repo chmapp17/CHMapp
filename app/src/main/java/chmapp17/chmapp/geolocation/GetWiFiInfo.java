@@ -22,11 +22,10 @@ public class GetWiFiInfo {
         accessPoints = new JSONArray();
         if (networkList != null) {
             try {
-                JSONObject apObj = new JSONObject();
                 for (ScanResult network : networkList) {
+                    JSONObject apObj = new JSONObject();
                     apObj.put("macAddress", network.BSSID);
                     apObj.put("signalStrength", network.level);
-                    apObj.put("age", network.timestamp / 1000);
                     accessPoints.put(apObj);
                 }
             } catch (JSONException e) {

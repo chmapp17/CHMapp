@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -22,6 +23,7 @@ import chmapp17.chmapp.R;
 public class GeoLocation {
 
     private LatLng latLng;
+    private double accuracy;
     private String url_google_api = "https://www.googleapis.com/geolocation/v1/geolocate?key=";
 
     public LatLng GetLocation(FragmentActivity activity) {
@@ -41,10 +43,15 @@ public class GeoLocation {
             JSONObject JResponse = new JSONObject(msg);
             JSONObject location = JResponse.getJSONObject("location");
             latLng = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
+            accuracy = JResponse.getDouble("accuracy");
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return latLng;
+    }
+
+    public double GetAccuracy(){
+        return accuracy;
     }
 
     private String getServerResponse(JSONObject toPost) {
@@ -75,10 +82,6 @@ public class GeoLocation {
                 result = sb.toString();
             }
             conn.disconnect();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
