@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -77,17 +79,16 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         fragmentManager = getSupportFragmentManager();
+
+        fragment = new HomeFragment();
+        transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.content, fragment, "home").commit();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         isAppVisible = true;
-        fragment = new HomeFragment();
-        transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.content, fragment, "home").commit();
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.getMenu().findItem(R.id.navigation_home).setChecked(true);
         requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                 LOCATION_PERMISSION_REQCODE);
     }
@@ -117,6 +118,13 @@ public class MainActivity extends AppCompatActivity {
             // other 'case' lines to check for other
             // permissions this app might request
         }
+    }
+
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     protected Runnable scanWiFiNetworks = new Runnable() {

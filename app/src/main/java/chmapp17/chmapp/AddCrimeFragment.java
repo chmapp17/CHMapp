@@ -60,6 +60,13 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        if (scheduleUpdateLocation != null)
+            scheduleUpdateLocation.shutdown();
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         addcMap = googleMap;
         MapHandling.updateMapPosition(getActivity(), addcMap);
