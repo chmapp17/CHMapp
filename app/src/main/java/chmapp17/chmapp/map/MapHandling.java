@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -30,10 +31,18 @@ public class MapHandling {
                 @Override
                 protected void onPostExecute(LatLng latLng) {
                     lGoogleMap.clear();
+                    float currZoom = lGoogleMap.getCameraPosition().zoom;
+                    if (currZoom == 2) {
+                        lGoogleMap.moveCamera(CameraUpdateFactory
+                                .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, 15)));
+                    }
+                    else {
+                        lGoogleMap.moveCamera(CameraUpdateFactory
+                                .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, currZoom)));
+                    }
                     lGoogleMap.addMarker(new MarkerOptions().position(latLng));
-                    lGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                    lGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-                    lGoogleMap.addCircle(new CircleOptions().center(latLng).radius(geoLocation.GetAccuracy())
+                    lGoogleMap.addCircle(new CircleOptions()
+                            .center(latLng).radius(geoLocation.GetAccuracy())
                             .strokeColor(Color.RED).strokeWidth(3).fillColor(0x50ff0000));
                 }
             }.execute();
