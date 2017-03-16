@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,12 +30,11 @@ public class MainActivity extends AppCompatActivity {
     private Fragment fragment;
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
-    Handler handler = new Handler();
-    private boolean isAppVisible = true;
+    private ScheduledExecutorService scheduleWiFiScan;
 
+    Handler handler = new Handler();
+    public static boolean isAppVisible = true;
     public static List<ScanResult> networkList;
-    ScheduledThreadPoolExecutor scheduleWiFiScan = (ScheduledThreadPoolExecutor)
-            Executors.newScheduledThreadPool(1);
     public static final int LOCATION_PERMISSION_REQCODE = 0;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -110,7 +109,8 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case LOCATION_PERMISSION_REQCODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    scheduleWiFiScan.scheduleAtFixedRate(scanWiFiNetworks, 0, 30, TimeUnit.SECONDS);
+                    scheduleWiFiScan = Executors.newSingleThreadScheduledExecutor();
+                    scheduleWiFiScan.scheduleAtFixedRate(scanWiFiNetworks, 0, 10, TimeUnit.SECONDS);
                 }
                 return;
             }
