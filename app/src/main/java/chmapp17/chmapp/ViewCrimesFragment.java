@@ -1,7 +1,6 @@
 package chmapp17.chmapp;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,7 +19,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
-import chmapp17.chmapp.geolocation.GeoLocation;
 import chmapp17.chmapp.map.MapHandling;
 
 public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
@@ -75,18 +73,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     public void onMapReady(GoogleMap googleMap) {
 
         viewcMap = googleMap;
-        final GeoLocation geoLocation = new GeoLocation();
-        new AsyncTask<Void, Void, LatLng>() {
-            @Override
-            protected LatLng doInBackground(Void... voids) {
-                return geoLocation.GetLocation(getActivity());
-            }
-
-            @Override
-            protected void onPostExecute(LatLng latLng) {
-                MapHandling.updateMapPosition(viewcMap, latLng, geoLocation.GetAccuracy());
-            }
-        }.execute();
+        MapHandling.updateMapPosition(getActivity(), viewcMap);
     }
 
     @Override

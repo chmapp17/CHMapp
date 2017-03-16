@@ -12,10 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 
 import chmapp17.chmapp.R;
@@ -50,7 +47,7 @@ public class GeoLocation {
         return latLng;
     }
 
-    public double GetAccuracy(){
+    public double GetAccuracy() {
         return accuracy;
     }
 

@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
             Executors.newScheduledThreadPool(1);
     public static final int LOCATION_PERMISSION_REQCODE = 0;
 
-
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
