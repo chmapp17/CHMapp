@@ -3,9 +3,11 @@ package chmapp17.chmapp;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
@@ -13,11 +15,13 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -110,6 +114,27 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case LOCATION_PERMISSION_REQCODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                    boolean gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                    boolean network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                    if (!gps_enabled && !network_enabled) {
+                        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                        dialog.setMessage(getString(R.string.location_disabled));
+                        dialog.setPositiveButton("Enable", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            }
+                        });
+                        dialog.setNegativeButton("Keep disabled", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                                dialog.setMessage(getString(R.string.explanation_location));
+                                dialog.show();
+                            }
+                        });
+                        dialog.show();
+                    }
                     scheduleWiFiScan = Executors.newSingleThreadScheduledExecutor();
                     scheduleWiFiScan.scheduleAtFixedRate(scanWiFiNetworks, 0, 10, TimeUnit.SECONDS);
                 }

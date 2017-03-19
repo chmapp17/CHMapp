@@ -35,8 +35,7 @@ public class MapHandling {
                     if (currZoom == 2) {
                         lGoogleMap.moveCamera(CameraUpdateFactory
                                 .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, 15)));
-                    }
-                    else {
+                    } else {
                         lGoogleMap.moveCamera(CameraUpdateFactory
                                 .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, currZoom)));
                     }

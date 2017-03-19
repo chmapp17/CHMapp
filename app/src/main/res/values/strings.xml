@@ -3,4 +3,6 @@
     <string name="title_home">Home</string>
     <string name="title_viewcrimes">View crimes</string>
     <string name="title_addcrime">Add crime</string>
+    <string name="location_disabled">Location is disabled. Please enable it for the app to work correctly.</string>
+    <string name="explanation_location">CHMapp needs location enabled to work correctly. Please enable it!</string>
 </resources>
