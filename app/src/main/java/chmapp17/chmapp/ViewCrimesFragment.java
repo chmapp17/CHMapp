@@ -32,6 +32,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
 
     Context ctx;
     private GoogleMap viewcMap;
+    private MapHandling mapHandling = new MapHandling();
     private double _longitude = 26.246355;
     private double _latitude = 47.641546;
 
@@ -56,7 +57,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     public void onStart() {
         super.onStart();
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.viewcmap);
+                .findFragmentById(R.id.viewcMapFragment);
         mapFragment.getMapAsync(this);
     }
 
@@ -73,7 +74,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     public void onMapReady(GoogleMap googleMap) {
 
         viewcMap = googleMap;
-        MapHandling.updateMapPosition(getActivity(), viewcMap);
+        mapHandling.updateMapPosition(getActivity(), viewcMap);
     }
 
     @Override

@@ -9,49 +9,103 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.35">
+        android:layout_weight="1">
 
         <fragment
-            android:id="@+id/addcmap"
+            android:id="@+id/addcMapFragment"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1.5" />
-
-        <ImageButton
-            android:id="@+id/myLocationButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            app:srcCompat="@drawable/ic_my_location_black_24dp" />
+            android:layout_height="match_parent" />
 
         <Switch
             android:id="@+id/autoLocationSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignTop="@+id/myLocationButton"
+            android:layout_marginBottom="3dp"
             android:layout_toStartOf="@+id/myLocationButton"
             android:text="Auto" />
-    </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/textView"
+        <ImageButton
+            android:id="@+id/myLocationButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/title_addcrime"
-            tools:layout_constraintLeft_creator="1"
-            tools:layout_constraintRight_creator="1"
-            tools:layout_constraintTop_creator="1"
-            tools:layout_editor_absoluteX="16dp"
-            tools:layout_editor_absoluteY="16dp" />
+            android:layout_alignBottom="@+id/autoLocationSwitch"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/autoLocationSwitch"
+            android:layout_marginEnd="5dp"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_my_location_black_24dp" />
+
     </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textCrime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Crime type"
+                android:textSize="16sp" />
+
+            <Spinner
+                android:id="@+id/spinnerCrimes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/editDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Date"
+                android:inputType="date" />
+
+            <Button
+                android:id="@+id/buttonAddCrime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@android:drawable/ic_menu_add"
+                android:drawablePadding="5dp"
+                android:text="Add crime"
+                android:textAllCaps="false" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/editCrimeDescr"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:hint="Crime description"
+                android:inputType="textMultiLine"
+                android:lines="2" />
+
+            <EditText
+                android:id="@+id/editLocationDescr"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:hint="Location description"
+                android:inputType="textMultiLine"
+                android:lines="2" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

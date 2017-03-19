@@ -5,4 +5,16 @@
     <string name="title_addcrime">Add crime</string>
     <string name="location_disabled">Location is disabled. Please enable it for the app to work correctly.</string>
     <string name="explanation_location">CHMapp needs location enabled to work correctly. Please enable it!</string>
+    <string-array name="crimes_array">
+        <item>Assault</item>
+        <item>Burglary</item>
+        <item>Kidnapping</item>
+        <item>Murder</item>
+        <item>Rape</item>
+        <item>Robbery</item>
+        <item>Shooting</item>
+        <item>Theft</item>
+        <item>Vandalsim</item>
+        <item>Other</item>
+    </string-array>
 </resources>

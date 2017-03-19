@@ -7,42 +7,44 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import chmapp17.chmapp.MainActivity;
+import chmapp17.chmapp.R;
 import chmapp17.chmapp.geolocation.GeoLocation;
 
 public class MapHandling {
 
-    public static void updateMapPosition(FragmentActivity activity, GoogleMap googleMap) {
+    public void updateMapPosition(final FragmentActivity activity, final GoogleMap googleMap) {
         if (MainActivity.isNetworkAvailable(activity)) {
             final GeoLocation geoLocation = new GeoLocation();
-            final FragmentActivity lActivity = activity;
-            final GoogleMap lGoogleMap = googleMap;
             new AsyncTask<Void, Void, LatLng>() {
                 @Override
                 protected LatLng doInBackground(Void... voids) {
-                    return geoLocation.GetLocation(lActivity);
+                    return geoLocation.GetLocation(activity);
                 }
 
                 @Override
                 protected void onPostExecute(LatLng latLng) {
-                    lGoogleMap.clear();
-                    float currZoom = lGoogleMap.getCameraPosition().zoom;
+                    googleMap.clear();
+                    float currZoom = googleMap.getCameraPosition().zoom;
                     if (currZoom == 2) {
-                        lGoogleMap.moveCamera(CameraUpdateFactory
+                        googleMap.moveCamera(CameraUpdateFactory
                                 .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, 15)));
                     } else {
-                        lGoogleMap.moveCamera(CameraUpdateFactory
+                        googleMap.moveCamera(CameraUpdateFactory
                                 .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, currZoom)));
                     }
-                    lGoogleMap.addMarker(new MarkerOptions().position(latLng));
-                    lGoogleMap.addCircle(new CircleOptions()
+                    googleMap.addMarker(new MarkerOptions().position(latLng).anchor(0.5f, 0.5f)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
+                    googleMap.addCircle(new CircleOptions()
                             .center(latLng).radius(geoLocation.GetAccuracy())
-                            .strokeColor(Color.RED).strokeWidth(3).fillColor(0x50ff0000));
+                            .fillColor(Color.argb(30, 0, 155, 255))
+                            .strokeColor(Color.argb(255, 0, 155, 255)).strokeWidth(2));
                 }
             }.execute();
         } else {
