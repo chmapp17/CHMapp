@@ -25,12 +25,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import chmapp17.chmapp.database.DataBaseHandling;
 import chmapp17.chmapp.map.MapHandling;
 
 public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap addcMap;
     private MapHandling mapHandling = new MapHandling();
+    private DataBaseHandling dbHandling = new DataBaseHandling();
     private ScheduledExecutorService scheduleUpdateLocation;
 
     @Override
@@ -74,7 +76,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
         buttonAddCrime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Crime added", Toast.LENGTH_SHORT).show();
+                dbHandling.testDB(getActivity());
             }
         });
 
