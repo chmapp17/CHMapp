@@ -11,7 +11,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class DataBaseHandling {
 
-    public void testDB(final FragmentActivity activity){
+    public void testDB(final FragmentActivity activity) {
         // Write a message to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("message");
