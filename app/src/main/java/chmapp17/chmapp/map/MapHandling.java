@@ -1,8 +1,9 @@
 package chmapp17.chmapp.map;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -19,22 +20,23 @@ import chmapp17.chmapp.geolocation.GeoLocation;
 
 public class MapHandling {
 
-    public void updateMapPosition(final FragmentActivity activity, final GoogleMap googleMap) {
-        if (MainActivity.isNetworkAvailable(activity)) {
+    public void updateMapPosition(final Context context, final GoogleMap googleMap) {
+        if (MainActivity.isNetworkAvailable(context)) {
             final GeoLocation geoLocation = new GeoLocation();
-            new AsyncTask<Void, Void, LatLng>() {
+            new AsyncTask<Void, Void, Location>() {
                 @Override
-                protected LatLng doInBackground(Void... voids) {
-                    return geoLocation.GetLocation(activity);
+                protected Location doInBackground(Void... voids) {
+                    return geoLocation.getLocation(context);
                 }
 
                 @Override
-                protected void onPostExecute(LatLng latLng) {
+                protected void onPostExecute(Location location) {
                     googleMap.clear();
+                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                     float currZoom = googleMap.getCameraPosition().zoom;
                     if (currZoom == 2) {
                         googleMap.moveCamera(CameraUpdateFactory
-                                .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, 15)));
+                                .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, 16)));
                     } else {
                         googleMap.moveCamera(CameraUpdateFactory
                                 .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, currZoom)));
@@ -42,13 +44,13 @@ public class MapHandling {
                     googleMap.addMarker(new MarkerOptions().position(latLng).anchor(0.5f, 0.5f)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
                     googleMap.addCircle(new CircleOptions()
-                            .center(latLng).radius(geoLocation.GetAccuracy())
+                            .center(latLng).radius(location.getAccuracy())
                             .fillColor(Color.argb(30, 0, 155, 255))
                             .strokeColor(Color.argb(255, 0, 155, 255)).strokeWidth(2));
                 }
             }.execute();
         } else {
-            Toast.makeText(activity, "No Internet Connection", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "No Internet Connection", Toast.LENGTH_SHORT).show();
         }
     }
 }

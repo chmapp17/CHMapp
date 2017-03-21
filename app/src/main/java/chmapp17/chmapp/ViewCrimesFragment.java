@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import chmapp17.chmapp.database.DataBaseHandling;
 import chmapp17.chmapp.map.MapHandling;
 
 public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
@@ -27,35 +27,27 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnMarkerDragListener,
         GoogleMap.OnMapLongClickListener,
         View.OnClickListener {
-    private static final int LATITUDE = 0;
-    private static final int LONGITUDE = 1;
 
-    Context ctx;
+    private Context context;
     private GoogleMap viewcMap;
     private MapHandling mapHandling = new MapHandling();
-    private double _longitude = 26.246355;
-    private double _latitude = 47.641546;
+    private DataBaseHandling dbHandling = new DataBaseHandling();
 
     //Buttons
-
     private ImageButton buttonSave;
     private ImageButton buttonCurrent;
     private ImageButton buttonView;
 
-    //Google ApiClient
-    private GoogleApiClient googleApiClient;
-    private FragmentActivity myContext = new FragmentActivity();
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         return inflater.inflate(R.layout.fragment_view_crimes, container, false);
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        context = getContext();
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.viewcMapFragment);
         mapFragment.getMapAsync(this);
@@ -72,9 +64,8 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
         viewcMap = googleMap;
-        mapHandling.updateMapPosition(getActivity(), viewcMap);
+        mapHandling.updateMapPosition(context, viewcMap);
     }
 
     @Override

@@ -8,7 +8,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -31,9 +30,6 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
     private ScheduledExecutorService scheduleWiFiScan;
-
-    Handler handler = new Handler();
-    public static boolean isAppVisible = true;
     public static List<ScanResult> networkList;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -80,12 +76,21 @@ public class MainActivity extends AppCompatActivity {
         fragment = new HomeFragment();
         transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.content, fragment, "home").commit();
+
+        registerReceiver(new BroadcastReceiver() {
+            final WifiManager wifiManager = (WifiManager) getApplicationContext()
+                    .getSystemService(Context.WIFI_SERVICE);
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                MainActivity.networkList = wifiManager.getScanResults();
+            }
+        }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        isAppVisible = true;
         scheduleWiFiScan = Executors.newSingleThreadScheduledExecutor();
         scheduleWiFiScan.scheduleAtFixedRate(scanWiFiNetworks, 0, 10, TimeUnit.SECONDS);
     }
@@ -93,13 +98,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        isAppVisible = false;
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        isAppVisible = true;
+        if (scheduleWiFiScan != null)
+            scheduleWiFiScan.shutdown();
     }
 
     public static boolean isNetworkAvailable(Context context) {
@@ -110,47 +110,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected Runnable scanWiFiNetworks = new Runnable() {
+        Handler handler = new Handler();
 
         @Override
         public void run() {
-            if (isAppVisible) {
-                new AsyncTask<Void, Void, List<ScanResult>>() {
-                    @Override
-                    protected List<ScanResult> doInBackground(Void... voids) {
-                        final WifiManager wifiManager = (WifiManager) getApplicationContext()
-                                .getSystemService(Context.WIFI_SERVICE);
-                        if (!wifiManager.isWifiEnabled()) {
-                            handler.post(new Runnable() {
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(), "Enabling WiFi",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            wifiManager.setWifiEnabled(true);
-                            while (!wifiManager.isWifiEnabled()) {
-                                try {
-                                    Thread.sleep(1);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                        wifiManager.startScan();
-                        registerReceiver(new BroadcastReceiver() {
-                            @Override
-                            public void onReceive(Context context, Intent intent) {
-                                wifiManager.getScanResults();
-                            }
-                        }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-                        return wifiManager.getScanResults();
+            final WifiManager wifiManager = (WifiManager) getApplicationContext()
+                    .getSystemService(Context.WIFI_SERVICE);
+            if (!wifiManager.isWifiEnabled()) {
+                handler.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "Enabling WiFi",
+                                Toast.LENGTH_SHORT).show();
                     }
-
-                    @Override
-                    protected void onPostExecute(List<ScanResult> networkList) {
-                        MainActivity.networkList = networkList;
+                });
+                wifiManager.setWifiEnabled(true);
+                while (!wifiManager.isWifiEnabled()) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                }.execute();
+                }
             }
+            wifiManager.startScan();
         }
     };
 }

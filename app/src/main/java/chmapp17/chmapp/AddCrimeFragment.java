@@ -1,5 +1,6 @@
 package chmapp17.chmapp;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -29,6 +30,7 @@ import chmapp17.chmapp.map.MapHandling;
 
 public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
 
+    private Context context;
     private GoogleMap addcMap;
     private MapHandling mapHandling = new MapHandling();
     private DataBaseHandling dbHandling = new DataBaseHandling();
@@ -57,7 +59,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
         myLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mapHandling.updateMapPosition(getActivity(), addcMap);
+                mapHandling.updateMapPosition(context, addcMap);
             }
         });
 
@@ -85,6 +87,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onStart() {
         super.onStart();
+        context = getContext();
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.addcMapFragment);
         mapFragment.getMapAsync(this);
@@ -100,16 +103,13 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         addcMap = googleMap;
-        mapHandling.updateMapPosition(getActivity(), addcMap);
+        mapHandling.updateMapPosition(context, addcMap);
     }
 
     protected Runnable autoUpdateLocation = new Runnable() {
-
         @Override
         public void run() {
-            if (MainActivity.isAppVisible) {
-                mapHandling.updateMapPosition(getActivity(), addcMap);
-            }
+            mapHandling.updateMapPosition(context, addcMap);
         }
     };
 }

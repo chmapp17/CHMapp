@@ -1,8 +1,7 @@
 package chmapp17.chmapp.geolocation;
 
-import android.support.v4.app.FragmentActivity;
-
-import com.google.android.gms.maps.model.LatLng;
+import android.content.Context;
+import android.location.Location;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,36 +18,30 @@ import chmapp17.chmapp.R;
 
 public class GeoLocation {
 
-    private LatLng latLng;
-    private double accuracy;
+    private Location location;
     private String url_google_api = "https://www.googleapis.com/geolocation/v1/geolocate?key=";
 
-    public LatLng GetLocation(FragmentActivity activity) {
+    public Location getLocation(Context context) {
 
-        url_google_api += activity.getString(R.string.google_maps_key);
+        url_google_api += context.getString(R.string.google_maps_key);
 
-        GetCellTowerInfo cellTowerInfo = new GetCellTowerInfo();
-        JSONArray CTobj = cellTowerInfo.getCellTowerObjects(activity);
-        GetWiFiInfo wiFiInfo = new GetWiFiInfo();
-        JSONArray APobj = wiFiInfo.getAccessPointObjects(activity);
+        JSONArray CTobj = (new CellTowerInfo()).getCellTowerObjects(context);
+        JSONArray APobj = (new WiFiInfo()).getAccessPointObjects();
         final JSONObject toPost = new JSONObject();
 
         try {
             toPost.put("cellTowers", CTobj);
             toPost.put("wifiAccessPoints", APobj);
-            String msg = getServerResponse(toPost);
-            JSONObject JResponse = new JSONObject(msg);
-            JSONObject location = JResponse.getJSONObject("location");
-            latLng = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
-            accuracy = JResponse.getDouble("accuracy");
+            JSONObject JResponse = new JSONObject(getServerResponse(toPost));
+            JSONObject locObject = JResponse.getJSONObject("location");
+            location = new Location("");
+            location.setLatitude(locObject.getDouble("lat"));
+            location.setLongitude(locObject.getDouble("lng"));
+            location.setAccuracy((float) JResponse.getDouble("accuracy"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return latLng;
-    }
-
-    public double GetAccuracy() {
-        return accuracy;
+        return location;
     }
 
     private String getServerResponse(JSONObject toPost) {

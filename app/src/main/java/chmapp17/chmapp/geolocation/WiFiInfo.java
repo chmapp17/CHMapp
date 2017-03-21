@@ -1,7 +1,6 @@
 package chmapp17.chmapp.geolocation;
 
 import android.net.wifi.ScanResult;
-import android.support.v4.app.FragmentActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,15 +10,12 @@ import java.util.List;
 
 import chmapp17.chmapp.MainActivity;
 
-public class GetWiFiInfo {
+public class WiFiInfo {
 
-    private JSONArray accessPoints;
-    private List<ScanResult> networkList;
+    public JSONArray getAccessPointObjects() {
 
-    public JSONArray getAccessPointObjects(FragmentActivity activity) {
-
-        networkList = MainActivity.networkList;
-        accessPoints = new JSONArray();
+        List<ScanResult> networkList = MainActivity.networkList;
+        JSONArray accessPoints = new JSONArray();
         if (networkList != null) {
             try {
                 for (ScanResult network : networkList) {

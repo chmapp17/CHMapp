@@ -15,11 +15,11 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class GetCellTowerInfo {
+public class CellTowerInfo {
 
-    public JSONArray getCellTowerObjects(Context ctx) {
+    public JSONArray getCellTowerObjects(Context context) {
 
-        TelephonyManager tel = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager tel = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         JSONArray cellTowers = new JSONArray();
 
         // Type of the network
