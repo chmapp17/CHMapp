@@ -65,7 +65,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         viewcMap = googleMap;
-        mapHandling.updateMapPosition(context, viewcMap);
+        mapHandling.updateLocation(context, viewcMap);
     }
 
     @Override

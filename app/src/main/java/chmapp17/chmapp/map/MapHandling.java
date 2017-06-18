@@ -14,13 +14,18 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 import chmapp17.chmapp.MainActivity;
 import chmapp17.chmapp.R;
+import chmapp17.chmapp.database.CrimeInfo;
 import chmapp17.chmapp.geolocation.GeoLocation;
 
 public class MapHandling {
 
-    public void updateMapPosition(final Context context, final GoogleMap googleMap) {
+    private Location currentLocation;
+
+    public void updateLocation(final Context context, final GoogleMap googleMap) {
         if (MainActivity.isNetworkAvailable(context)) {
             final GeoLocation geoLocation = new GeoLocation();
             new AsyncTask<Void, Void, Location>() {
@@ -31,6 +36,7 @@ public class MapHandling {
 
                 @Override
                 protected void onPostExecute(Location location) {
+                    currentLocation = location;
                     googleMap.clear();
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                     float currZoom = googleMap.getCameraPosition().zoom;
@@ -52,5 +58,13 @@ public class MapHandling {
         } else {
             Toast.makeText(context, "No Internet Connection", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void showCrimes(GoogleMap googleMap, ArrayList<CrimeInfo> crimes) {
+
+    }
+
+    public Location getCurrentLocation() {
+        return currentLocation;
     }
 }

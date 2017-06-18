@@ -1,39 +1,44 @@
 package chmapp17.chmapp.database;
 
-import android.support.v4.app.FragmentActivity;
-import android.widget.Toast;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 public class DataBaseHandling {
 
-    public void testDB(final FragmentActivity activity) {
-        // Write a message to the database
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
+    private DatabaseReference dbRef;
+    private ArrayList<CrimeInfo> crimes;
 
-        myRef.setValue("Hello, World!");
+    public DataBaseHandling() {
+        dbRef = FirebaseDatabase.getInstance().getReference("crimes");
+        crimes = new ArrayList<>();
 
-        // Read from the database
-        myRef.addValueEventListener(new ValueEventListener() {
+        dbRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
-                Toast.makeText(activity, "Value is: " + value, Toast.LENGTH_SHORT).show();
+                for (DataSnapshot crimeSnapshot : dataSnapshot.getChildren()) {
+                    crimes.add(crimeSnapshot.getValue(CrimeInfo.class));
+                }
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Toast.makeText(activity, "Failed to read value. " + error.toException().toString(),
-                        Toast.LENGTH_SHORT).show();
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("DataBaseError: " + databaseError.getCode());
             }
         });
+    }
+
+    public void addCrime(CrimeInfo crime) {
+        dbRef.push().setValue(crime);
+    }
+
+    public ArrayList<CrimeInfo> getCrimes() {
+        return crimes;
     }
 }
