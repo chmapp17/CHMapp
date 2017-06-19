@@ -19,10 +19,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import chmapp17.chmapp.database.CrimeInfo;
+import chmapp17.chmapp.database.DataBaseHandling;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
     private ScheduledExecutorService scheduleWiFiScan;
+    private DataBaseHandling dbHandling = new DataBaseHandling();
+    public static boolean crimesShown;
+    public static ArrayList<CrimeInfo> crimes = new ArrayList<>();
     public static List<ScanResult> networkList;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -47,16 +54,26 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.navigation_viewcrimes:
                     if (fragmentManager.findFragmentByTag("viewc") == null) {
-                        fragment = new ViewCrimesFragment();
-                        transaction = fragmentManager.beginTransaction();
-                        transaction.replace(R.id.content, fragment, "viewc").commit();
+                        if (!crimes.isEmpty()) {
+                            fragment = new ViewCrimesFragment();
+                            transaction = fragmentManager.beginTransaction();
+                            transaction.replace(R.id.content, fragment, "viewc").commit();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Waiting for data",
+                                    Toast.LENGTH_SHORT).show();
+                        }
                     }
                     break;
                 case R.id.navigation_addcrime:
                     if (fragmentManager.findFragmentByTag("addc") == null) {
-                        fragment = new AddCrimeFragment();
-                        transaction = fragmentManager.beginTransaction();
-                        transaction.replace(R.id.content, fragment, "addc").commit();
+                        if (!crimes.isEmpty()) {
+                            fragment = new AddCrimeFragment();
+                            transaction = fragmentManager.beginTransaction();
+                            transaction.replace(R.id.content, fragment, "addc").commit();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Waiting for data",
+                                    Toast.LENGTH_SHORT).show();
+                        }
                     }
                     break;
             }
@@ -76,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
         fragment = new HomeFragment();
         transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.content, fragment, "home").commit();
+
+        dbHandling.readData();
 
         registerReceiver(new BroadcastReceiver() {
             final WifiManager wifiManager = (WifiManager) getApplicationContext()

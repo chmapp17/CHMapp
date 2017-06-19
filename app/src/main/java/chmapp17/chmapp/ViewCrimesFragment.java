@@ -41,6 +41,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        MainActivity.crimesShown = false;
         return inflater.inflate(R.layout.fragment_view_crimes, container, false);
     }
 
@@ -65,7 +66,8 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         viewcMap = googleMap;
-        mapHandling.updateLocation(context, viewcMap);
+        if (!MainActivity.crimesShown)
+            mapHandling.updateLocation(context, viewcMap, true);
     }
 
     @Override

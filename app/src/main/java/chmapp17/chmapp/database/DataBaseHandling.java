@@ -6,24 +6,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
+import chmapp17.chmapp.MainActivity;
 
 public class DataBaseHandling {
 
-    private DatabaseReference dbRef;
-    private ArrayList<CrimeInfo> crimes;
+    private DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("crimes");
 
-    public DataBaseHandling() {
-        dbRef = FirebaseDatabase.getInstance().getReference("crimes");
-        crimes = new ArrayList<>();
-
+    public void readData() {
         dbRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 for (DataSnapshot crimeSnapshot : dataSnapshot.getChildren()) {
-                    crimes.add(crimeSnapshot.getValue(CrimeInfo.class));
+                    MainActivity.crimes.add(crimeSnapshot.getValue(CrimeInfo.class));
                 }
             }
 
@@ -36,9 +32,5 @@ public class DataBaseHandling {
 
     public void addCrime(CrimeInfo crime) {
         dbRef.push().setValue(crime);
-    }
-
-    public ArrayList<CrimeInfo> getCrimes() {
-        return crimes;
     }
 }

@@ -10,11 +10,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.util.ArrayList;
 
 import chmapp17.chmapp.MainActivity;
 import chmapp17.chmapp.R;
@@ -24,8 +24,10 @@ import chmapp17.chmapp.geolocation.GeoLocation;
 public class MapHandling {
 
     private Location currentLocation;
+    private Marker bluedotMarker;
+    private Circle accuracyCircle;
 
-    public void updateLocation(final Context context, final GoogleMap googleMap) {
+    public void updateLocation(final Context context, final GoogleMap googleMap, final boolean showCrimes) {
         if (MainActivity.isNetworkAvailable(context)) {
             final GeoLocation geoLocation = new GeoLocation();
             new AsyncTask<Void, Void, Location>() {
@@ -37,7 +39,10 @@ public class MapHandling {
                 @Override
                 protected void onPostExecute(Location location) {
                     currentLocation = location;
-                    googleMap.clear();
+                    if (bluedotMarker != null) {
+                        bluedotMarker.remove();
+                        accuracyCircle.remove();
+                    }
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                     float currZoom = googleMap.getCameraPosition().zoom;
                     if (currZoom == 2) {
@@ -47,21 +52,38 @@ public class MapHandling {
                         googleMap.moveCamera(CameraUpdateFactory
                                 .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, currZoom)));
                     }
-                    googleMap.addMarker(new MarkerOptions().position(latLng).anchor(0.5f, 0.5f)
+                    bluedotMarker = googleMap.addMarker(new MarkerOptions()
+                            .position(latLng).anchor(0.5f, 0.5f)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
-                    googleMap.addCircle(new CircleOptions()
+                    accuracyCircle = googleMap.addCircle(new CircleOptions()
                             .center(latLng).radius(location.getAccuracy())
                             .fillColor(Color.argb(30, 0, 155, 255))
                             .strokeColor(Color.argb(255, 0, 155, 255)).strokeWidth(2));
+
+                    if (showCrimes) {
+                        MainActivity.crimesShown = true;
+                        Location crimeLocation = new Location("crime");
+                        for (CrimeInfo crime : MainActivity.crimes) {
+                            String[] coord = crime.cLocation.replace(",", "").split(" ");
+                            crimeLocation.setLatitude(Double.parseDouble(coord[0]));
+                            crimeLocation.setLongitude(Double.parseDouble(coord[1]));
+                            if (currentLocation != null &&
+                                    currentLocation.distanceTo(crimeLocation) < 10000) {
+                                googleMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(crimeLocation.getLatitude(),
+                                                crimeLocation.getLongitude()))
+                                        .title(crime.cType)
+                                        .snippet("Date: " + crime.cDate +
+                                                " Crime description: " + crime.cDescr +
+                                                " Location description: " + crime.lDescr));
+                            }
+                        }
+                    }
                 }
             }.execute();
         } else {
             Toast.makeText(context, "No Internet Connection", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public void showCrimes(GoogleMap googleMap, ArrayList<CrimeInfo> crimes) {
-
     }
 
     public Location getCurrentLocation() {

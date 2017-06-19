@@ -18,10 +18,11 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -38,7 +39,6 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     private MapHandling mapHandling = new MapHandling();
     private DataBaseHandling dbHandling = new DataBaseHandling();
     private ScheduledExecutorService scheduleUpdateLocation;
-    private ArrayList<CrimeInfo> crimes;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,7 +63,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
         myLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mapHandling.updateLocation(context, addcMap);
+                mapHandling.updateLocation(context, addcMap, false);
             }
         });
 
@@ -84,16 +84,25 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
         buttonAddCrime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dbHandling.addCrime(new CrimeInfo(spinnerCrimes.getSelectedItem().toString(),
+                double lat = mapHandling.getCurrentLocation().getLatitude();
+                double lng = mapHandling.getCurrentLocation().getLongitude();
+                CrimeInfo crime = new CrimeInfo(spinnerCrimes.getSelectedItem().toString(),
                         editDate.getText().toString(),
                         editCrimeDescr.getText().toString(),
                         editLocationDescr.getText().toString(),
-                        mapHandling.getCurrentLocation().getLatitude() + ", " +
-                                mapHandling.getCurrentLocation().getLongitude()));
+                        lat + ", " + lng);
+                dbHandling.addCrime(crime);
+                addcMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(lat, lng))
+                        .title(crime.cType)
+                        .snippet("Date: " + crime.cDate +
+                                " Crime description: " + crime.cDescr +
+                                " Location description: " + crime.lDescr));
                 Toast.makeText(getActivity(), "Crime added", Toast.LENGTH_SHORT).show();
             }
         });
 
+        MainActivity.crimesShown = false;
         return view;
     }
 
@@ -116,18 +125,15 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         addcMap = googleMap;
-        mapHandling.updateLocation(context, addcMap);
-        crimes = dbHandling.getCrimes();
-        mapHandling.showCrimes(addcMap, crimes);
-        for (CrimeInfo crime : crimes) {
-            Toast.makeText(getActivity(), "Crime: " + crime, Toast.LENGTH_SHORT).show();
-        }
+        if (!MainActivity.crimesShown)
+            mapHandling.updateLocation(context, addcMap, true);
+
     }
 
     protected Runnable autoUpdateLocation = new Runnable() {
         @Override
         public void run() {
-            mapHandling.updateLocation(context, addcMap);
+            mapHandling.updateLocation(context, addcMap, false);
         }
     };
 }
