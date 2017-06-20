@@ -22,6 +22,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import chmapp17.chmapp.database.CrimeInfo;
 import chmapp17.chmapp.database.DataBaseHandling;
 import chmapp17.chmapp.map.MapHandling;
 
@@ -88,8 +89,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
 
             @Override
             public void onMapClick(LatLng point) {
-                if(Marker_clicked == true)
-                {
+                if (Marker_clicked == true) {
                     Marker_clicked = false;
                     Button buttonReviewCrime = (Button) view_global.findViewById(R.id.buttonReviewCrime);
                     buttonReviewCrime.setVisibility(View.GONE);
@@ -101,32 +101,32 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
             }
         });
 
-        viewcMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener()
-        {
+        viewcMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 
             @Override
             public boolean onMarkerClick(Marker arg0) {
                 // if(arg0.getTitle().equals("MyHome")) // if marker source is clicked
-                if(!Marker_id.contentEquals(arg0.getId()))
+                if (!Marker_id.contentEquals(arg0.getId()))
                     Marker_clicked = false;
 
-                if(Marker_clicked == false ) {
+                if (Marker_clicked == false) {
                     Marker_id = arg0.getId();
+                    CrimeInfo crime = mapHandling.getMarkerCrimeInfo(Marker_id);
+
                     Button buttonReviewCrime = (Button) view_global.findViewById(R.id.buttonReviewCrime);
                     buttonReviewCrime.setVisibility(View.VISIBLE);
 
                     TextView viewCrimeType = (TextView) view_global.findViewById(R.id.viewCrimeType);
-                    viewCrimeType.setText("Crime: " + arg0.getTitle());
+                    viewCrimeType.setText("Crime type: " + crime.cType);
                     viewCrimeType.setVisibility(View.VISIBLE);
 
                     TextView viewCrimeDescription = (TextView) view_global.findViewById(R.id.viewCrimeDescription);
-                    viewCrimeDescription.setText(arg0.getSnippet() + arg0.getSnippet());
+                    viewCrimeDescription.setText("Crime description: " + crime.cDescr);
                     viewCrimeDescription.setVisibility(View.VISIBLE);
 
                     Toast.makeText(context, "clicked marker", Toast.LENGTH_SHORT).show();// display toast
                     Marker_clicked = true;
-                }
-                else{
+                } else {
                     Button buttonReviewCrime = (Button) view_global.findViewById(R.id.buttonReviewCrime);
                     buttonReviewCrime.setVisibility(View.GONE);
                     TextView viewCrimeDescription = (TextView) view_global.findViewById(R.id.viewCrimeDescription);
@@ -136,7 +136,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
                     Marker_clicked = false;
                 }
 
-               // if (!MainActivity.crimes.isEmpty())
+                // if (!MainActivity.crimes.isEmpty())
 
                 return true;
             }

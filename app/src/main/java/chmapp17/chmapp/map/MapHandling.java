@@ -22,6 +22,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.HashMap;
+
 import chmapp17.chmapp.MainActivity;
 import chmapp17.chmapp.R;
 import chmapp17.chmapp.database.CrimeInfo;
@@ -32,6 +34,8 @@ public class MapHandling {
     private Location currentLocation;
     private Marker bluedotMarker;
     private Circle accuracyCircle;
+    private int crimeRadius = 3000;
+    private HashMap<String, Integer> mapMarkersCrimes = new HashMap<>();
 
     public void updateLocation(final Context context, final GoogleMap googleMap, final boolean showCrimes) {
         if (MainActivity.isNetworkAvailable(context)) {
@@ -76,9 +80,9 @@ public class MapHandling {
                                 crimeLocation.setLatitude(Double.parseDouble(coord[0]));
                                 crimeLocation.setLongitude(Double.parseDouble(coord[1]));
                                 if (currentLocation != null &&
-                                        currentLocation.distanceTo(crimeLocation) < 10000) {
+                                        currentLocation.distanceTo(crimeLocation) < crimeRadius) {
                                     int drawable_id = crime.getCrimeDrawableID(context, crime.cType, "pin");
-                                    googleMap.addMarker(new MarkerOptions()
+                                    Marker crimeMarker = googleMap.addMarker(new MarkerOptions()
                                             .position(new LatLng(crimeLocation.getLatitude(),
                                                     crimeLocation.getLongitude()))
                                             .icon(drawable_id == 0 ?
@@ -86,6 +90,7 @@ public class MapHandling {
                                                     getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
                                             .title(crime.cType)
                                             .snippet(crime.cDate));
+                                    mapMarkersCrimes.put(crimeMarker.getId(), MainActivity.crimes.indexOf(crime));
                                 }
                             }
                         } else {
@@ -107,6 +112,10 @@ public class MapHandling {
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         drawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    public CrimeInfo getMarkerCrimeInfo(String mId) {
+        return MainActivity.crimes.get(mapMarkersCrimes.get(mId));
     }
 
     public Location getCurrentLocation() {
