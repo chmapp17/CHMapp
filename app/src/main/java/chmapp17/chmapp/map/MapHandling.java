@@ -1,7 +1,10 @@
 package chmapp17.chmapp.map;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.widget.Toast;
@@ -67,6 +70,9 @@ public class MapHandling {
                             String[] coord = crime.cLocation.replace(",", "").split(" ");
                             crimeLocation.setLatitude(Double.parseDouble(coord[0]));
                             crimeLocation.setLongitude(Double.parseDouble(coord[1]));
+
+                            Bitmap smallMarker = resizeMapMarker(context,"img_"+ crime.cType.toLowerCase(), 100, 100);
+
                             if (currentLocation != null &&
                                     currentLocation.distanceTo(crimeLocation) < 10000) {
                                 googleMap.addMarker(new MarkerOptions()
@@ -75,7 +81,8 @@ public class MapHandling {
                                         .title(crime.cType)
                                         .snippet("Date: " + crime.cDate +
                                                 " Crime description: " + crime.cDescr +
-                                                " Location description: " + crime.lDescr));
+                                                " Location description: " + crime.lDescr)
+                                        .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
                             }
                         }
                     }
@@ -89,4 +96,12 @@ public class MapHandling {
     public Location getCurrentLocation() {
         return currentLocation;
     }
+
+    private Bitmap resizeMapMarker(final Context context, String imgName, int width, int height){
+        Bitmap imageBitmap = BitmapFactory.decodeResource(context.getResources(),context.getResources().getIdentifier(imgName, "drawable", context.getPackageName()));
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+
+        return resizedBitmap;
+    }
+
 }
