@@ -5,10 +5,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -32,8 +36,11 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     private GoogleMap viewcMap;
     private MapHandling mapHandling = new MapHandling();
     private DataBaseHandling dbHandling = new DataBaseHandling();
-
+    private View view_global;
+    private boolean Marker_clicked = false;
+    private String Marker_id = "";
     //Buttons
+
     private ImageButton buttonSave;
     private ImageButton buttonCurrent;
     private ImageButton buttonView;
@@ -41,8 +48,16 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        view_global = inflater.inflate(R.layout.fragment_view_crimes, container, false);
         MainActivity.crimesShown = false;
-        return inflater.inflate(R.layout.fragment_view_crimes, container, false);
+        Button buttonReviewCrime = (Button) view_global.findViewById(R.id.buttonReviewCrime);
+        buttonReviewCrime.setVisibility(View.GONE);
+        TextView viewCrimeDescription = (TextView) view_global.findViewById(R.id.viewCrimeDescription);
+        viewCrimeDescription.setVisibility(View.GONE);
+        TextView viewCrimeType = (TextView) view_global.findViewById(R.id.viewCrimeType);
+        viewCrimeType.setVisibility(View.GONE);
+        viewCrimeDescription.setMovementMethod(new ScrollingMovementMethod());
+        return view_global;
     }
 
     @Override
@@ -68,6 +83,66 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
         viewcMap = googleMap;
         if (!MainActivity.crimesShown)
             mapHandling.updateLocation(context, viewcMap, true);
+
+        viewcMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+            @Override
+            public void onMapClick(LatLng point) {
+                if(Marker_clicked == true)
+                {
+                    Marker_clicked = false;
+                    Button buttonReviewCrime = (Button) view_global.findViewById(R.id.buttonReviewCrime);
+                    buttonReviewCrime.setVisibility(View.GONE);
+                    TextView viewCrimeDescription = (TextView) view_global.findViewById(R.id.viewCrimeDescription);
+                    viewCrimeDescription.setVisibility(View.GONE);
+                    TextView viewCrimeType = (TextView) view_global.findViewById(R.id.viewCrimeType);
+                    viewCrimeType.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        viewcMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener()
+        {
+
+            @Override
+            public boolean onMarkerClick(Marker arg0) {
+                // if(arg0.getTitle().equals("MyHome")) // if marker source is clicked
+                if(!Marker_id.contentEquals(arg0.getId()))
+                    Marker_clicked = false;
+
+                if(Marker_clicked == false ) {
+                    Marker_id = arg0.getId();
+                    Button buttonReviewCrime = (Button) view_global.findViewById(R.id.buttonReviewCrime);
+                    buttonReviewCrime.setVisibility(View.VISIBLE);
+
+                    TextView viewCrimeType = (TextView) view_global.findViewById(R.id.viewCrimeType);
+                    viewCrimeType.setText("Crime: " + arg0.getTitle());
+                    viewCrimeType.setVisibility(View.VISIBLE);
+
+                    TextView viewCrimeDescription = (TextView) view_global.findViewById(R.id.viewCrimeDescription);
+                    viewCrimeDescription.setText(arg0.getSnippet() + arg0.getSnippet());
+                    viewCrimeDescription.setVisibility(View.VISIBLE);
+
+                    Toast.makeText(context, "clicked marker", Toast.LENGTH_SHORT).show();// display toast
+                    Marker_clicked = true;
+                }
+                else{
+                    Button buttonReviewCrime = (Button) view_global.findViewById(R.id.buttonReviewCrime);
+                    buttonReviewCrime.setVisibility(View.GONE);
+                    TextView viewCrimeDescription = (TextView) view_global.findViewById(R.id.viewCrimeDescription);
+                    viewCrimeDescription.setVisibility(View.GONE);
+                    TextView viewCrimeType = (TextView) view_global.findViewById(R.id.viewCrimeType);
+                    viewCrimeType.setVisibility(View.GONE);
+                    Marker_clicked = false;
+                }
+
+               // if (!MainActivity.crimes.isEmpty())
+
+                return true;
+            }
+        });
+
+
     }
 
     @Override
