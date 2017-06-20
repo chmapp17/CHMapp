@@ -1,7 +1,9 @@
 package chmapp17.chmapp;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -82,6 +85,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
 
         Button buttonAddCrime = (Button) view.findViewById(R.id.buttonAddCrime);
         buttonAddCrime.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View v) {
                 double lat = mapHandling.getCurrentLocation().getLatitude();
@@ -92,13 +96,15 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
                         editLocationDescr.getText().toString(),
                         lat + ", " + lng);
                 dbHandling.addCrime(crime);
+                int drawable_id = mapHandling.getCrimeDrawableID(context, crime.cType);
                 addcMap.addMarker(new MarkerOptions()
                         .position(new LatLng(lat, lng))
+                        .icon(drawable_id == 0 ?
+                                BitmapDescriptorFactory.defaultMarker() :
+                                mapHandling.getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
                         .title(crime.cType)
-                        .snippet("Date: " + crime.cDate +
-                                " Crime description: " + crime.cDescr +
-                                " Location description: " + crime.lDescr));
-                Toast.makeText(getActivity(), "Crime added", Toast.LENGTH_SHORT).show();
+                        .snippet("Date: " + crime.cDate));
+                Toast.makeText(context, "Crime added", Toast.LENGTH_SHORT).show();
             }
         });
 

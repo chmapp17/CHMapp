@@ -4,15 +4,20 @@
     <string name="title_viewcrimes">View crimes</string>
     <string name="title_addcrime">Add crime</string>
     <string-array name="crimes_array">
+        <item>Arson</item>
         <item>Assault</item>
         <item>Burglary</item>
-        <item>Kidnapping</item>
-        <item>Murder</item>
-        <item>Rape</item>
+        <item>Disturbing the Peace</item>
+        <item>Drugs / Alcohol Violations</item>
+        <item>Driving under the influence</item>
+        <item>Fraud</item>
+        <item>Homicide</item>
+        <item>Motor Vehicle Theft</item>
         <item>Robbery</item>
-        <item>Shooting</item>
-        <item>Theft</item>
-        <item>Vandalsim</item>
-        <item>Other</item>
+        <item>Sex Crimes</item>
+        <item>Theft / Larceny</item>
+        <item>Vandalism</item>
+        <item>Vehicle Break-In / Theft</item>
+        <item>Weapons</item>
     </string-array>
 </resources>

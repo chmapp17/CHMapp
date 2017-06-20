@@ -54,26 +54,16 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.navigation_viewcrimes:
                     if (fragmentManager.findFragmentByTag("viewc") == null) {
-                        if (!crimes.isEmpty()) {
-                            fragment = new ViewCrimesFragment();
-                            transaction = fragmentManager.beginTransaction();
-                            transaction.replace(R.id.content, fragment, "viewc").commit();
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Waiting for data",
-                                    Toast.LENGTH_SHORT).show();
-                        }
+                        fragment = new ViewCrimesFragment();
+                        transaction = fragmentManager.beginTransaction();
+                        transaction.replace(R.id.content, fragment, "viewc").commit();
                     }
                     break;
                 case R.id.navigation_addcrime:
                     if (fragmentManager.findFragmentByTag("addc") == null) {
-                        if (!crimes.isEmpty()) {
-                            fragment = new AddCrimeFragment();
-                            transaction = fragmentManager.beginTransaction();
-                            transaction.replace(R.id.content, fragment, "addc").commit();
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Waiting for data",
-                                    Toast.LENGTH_SHORT).show();
-                        }
+                        fragment = new AddCrimeFragment();
+                        transaction = fragmentManager.beginTransaction();
+                        transaction.replace(R.id.content, fragment, "addc").commit();
                     }
                     break;
             }

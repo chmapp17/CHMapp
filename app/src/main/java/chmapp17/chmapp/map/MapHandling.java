@@ -1,13 +1,19 @@
 package chmapp17.chmapp.map;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
@@ -36,6 +42,7 @@ public class MapHandling {
                     return geoLocation.getLocation(context);
                 }
 
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 protected void onPostExecute(Location location) {
                     currentLocation = location;
@@ -61,22 +68,28 @@ public class MapHandling {
                             .strokeColor(Color.argb(255, 0, 155, 255)).strokeWidth(2));
 
                     if (showCrimes) {
-                        MainActivity.crimesShown = true;
-                        Location crimeLocation = new Location("crime");
-                        for (CrimeInfo crime : MainActivity.crimes) {
-                            String[] coord = crime.cLocation.replace(",", "").split(" ");
-                            crimeLocation.setLatitude(Double.parseDouble(coord[0]));
-                            crimeLocation.setLongitude(Double.parseDouble(coord[1]));
-                            if (currentLocation != null &&
-                                    currentLocation.distanceTo(crimeLocation) < 10000) {
-                                googleMap.addMarker(new MarkerOptions()
-                                        .position(new LatLng(crimeLocation.getLatitude(),
-                                                crimeLocation.getLongitude()))
-                                        .title(crime.cType)
-                                        .snippet("Date: " + crime.cDate +
-                                                " Crime description: " + crime.cDescr +
-                                                " Location description: " + crime.lDescr));
+                        if (!MainActivity.crimes.isEmpty()) {
+                            MainActivity.crimesShown = true;
+                            Location crimeLocation = new Location("crime");
+                            for (CrimeInfo crime : MainActivity.crimes) {
+                                String[] coord = crime.cLocation.replace(",", "").split(" ");
+                                crimeLocation.setLatitude(Double.parseDouble(coord[0]));
+                                crimeLocation.setLongitude(Double.parseDouble(coord[1]));
+                                if (currentLocation != null &&
+                                        currentLocation.distanceTo(crimeLocation) < 10000) {
+                                    int drawable_id = getCrimeDrawableID(context, crime.cType);
+                                    googleMap.addMarker(new MarkerOptions()
+                                            .position(new LatLng(crimeLocation.getLatitude(),
+                                                    crimeLocation.getLongitude()))
+                                            .icon(drawable_id == 0 ?
+                                                    BitmapDescriptorFactory.defaultMarker() :
+                                                    getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
+                                            .title(crime.cType)
+                                            .snippet("Date: " + crime.cDate));
+                                }
                             }
+                        } else {
+                            Toast.makeText(context, "Waiting for crime data", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -84,6 +97,28 @@ public class MapHandling {
         } else {
             Toast.makeText(context, "No Internet Connection", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public BitmapDescriptor getMarkerIconFromDrawable(Drawable drawable) {
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap
+                (drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    public int getCrimeDrawableID(Context context, String cStr) {
+        String[] crimes_array = context.getResources().getStringArray(R.array.crimes_array);
+        int i = 0, drawable_id = 0;
+        for (String cType : crimes_array) {
+            i += 1;
+            if (cType.equals(cStr))
+                drawable_id = context.getResources()
+                        .getIdentifier("crime_pin_" + i, "drawable", context.getPackageName());
+        }
+        return drawable_id;
     }
 
     public Location getCurrentLocation() {
