@@ -42,8 +42,8 @@ public class MapHandling {
                     return geoLocation.getLocation(context);
                 }
 
-                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 @Override
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 protected void onPostExecute(Location location) {
                     currentLocation = location;
                     if (bluedotMarker != null) {
@@ -77,7 +77,7 @@ public class MapHandling {
                                 crimeLocation.setLongitude(Double.parseDouble(coord[1]));
                                 if (currentLocation != null &&
                                         currentLocation.distanceTo(crimeLocation) < 10000) {
-                                    int drawable_id = getCrimeDrawableID(context, crime.cType);
+                                    int drawable_id = crime.getCrimeDrawableID(context, crime.cType, "pin");
                                     googleMap.addMarker(new MarkerOptions()
                                             .position(new LatLng(crimeLocation.getLatitude(),
                                                     crimeLocation.getLongitude()))
@@ -85,7 +85,7 @@ public class MapHandling {
                                                     BitmapDescriptorFactory.defaultMarker() :
                                                     getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
                                             .title(crime.cType)
-                                            .snippet("Date: " + crime.cDate));
+                                            .snippet(crime.cDate));
                                 }
                             }
                         } else {
@@ -107,18 +107,6 @@ public class MapHandling {
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         drawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
-
-    public int getCrimeDrawableID(Context context, String cStr) {
-        String[] crimes_array = context.getResources().getStringArray(R.array.crimes_array);
-        int i = 0, drawable_id = 0;
-        for (String cType : crimes_array) {
-            i += 1;
-            if (cType.equals(cStr))
-                drawable_id = context.getResources()
-                        .getIdentifier("crime_pin_" + i, "drawable", context.getPackageName());
-        }
-        return drawable_id;
     }
 
     public Location getCurrentLocation() {

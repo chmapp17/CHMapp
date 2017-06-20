@@ -1,5 +1,9 @@
 package chmapp17.chmapp.database;
 
+import android.content.Context;
+
+import chmapp17.chmapp.R;
+
 public class CrimeInfo {
 
     public String cType, cDate, cDescr, lDescr, cLocation;
@@ -15,8 +19,15 @@ public class CrimeInfo {
         this.cLocation = cLocation;
     }
 
-    @Override
-    public String toString() {
-        return cType + " " + cDate + " " + cDescr + " " + lDescr + " " + cLocation;
+    public int getCrimeDrawableID(Context context, String cType, String dType) {
+        String[] crimes_array = context.getResources().getStringArray(R.array.crimes_array);
+        int i = 0, drawable_id = 0;
+        for (String cStr : crimes_array) {
+            i += 1;
+            if (cStr.equals(cType))
+                drawable_id = context.getResources()
+                        .getIdentifier("crime" + i + "_" + dType, "drawable", context.getPackageName());
+        }
+        return drawable_id;
     }
 }

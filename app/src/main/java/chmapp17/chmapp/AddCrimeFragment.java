@@ -77,7 +77,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
         spinnerCrimes.setAdapter(adapter);
 
         final EditText editDate = (EditText) view.findViewById(R.id.editDate);
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyy");
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyy @ HH:mm");
         editDate.setText(dateFormat.format(Calendar.getInstance().getTime()));
 
         final EditText editCrimeDescr = (EditText) view.findViewById(R.id.editCrimeDescr);
@@ -85,8 +85,8 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
 
         Button buttonAddCrime = (Button) view.findViewById(R.id.buttonAddCrime);
         buttonAddCrime.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             public void onClick(View v) {
                 double lat = mapHandling.getCurrentLocation().getLatitude();
                 double lng = mapHandling.getCurrentLocation().getLongitude();
@@ -96,14 +96,14 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
                         editLocationDescr.getText().toString(),
                         lat + ", " + lng);
                 dbHandling.addCrime(crime);
-                int drawable_id = mapHandling.getCrimeDrawableID(context, crime.cType);
+                int drawable_id = crime.getCrimeDrawableID(context, crime.cType, "pin");
                 addcMap.addMarker(new MarkerOptions()
                         .position(new LatLng(lat, lng))
                         .icon(drawable_id == 0 ?
                                 BitmapDescriptorFactory.defaultMarker() :
                                 mapHandling.getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
                         .title(crime.cType)
-                        .snippet("Date: " + crime.cDate));
+                        .snippet(crime.cDate));
                 Toast.makeText(context, "Crime added", Toast.LENGTH_SHORT).show();
             }
         });
