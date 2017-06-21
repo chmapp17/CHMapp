@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private ScheduledExecutorService scheduleWiFiScan;
     private DataBaseHandling dbHandling = new DataBaseHandling();
     public static boolean crimesShown;
-    public static ArrayList<CrimeInfo> crimes = new ArrayList<>();
+    public static ArrayList<CrimeInfo> crimeList = new ArrayList<>();
+    public static HashMap<Integer, String> mapCrimesKeys = new HashMap<>();
     public static List<ScanResult> networkList;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener

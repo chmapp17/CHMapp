@@ -7,8 +7,10 @@ import chmapp17.chmapp.R;
 public class CrimeInfo {
 
     public String cType, cDate, cDescr, lDescr, cLocation;
+    public int cRating = 0;
 
     public CrimeInfo() {
+        // Default constructor required for calls to DataSnapshot.getValue(CrimeInfo.class)
     }
 
     public CrimeInfo(String cType, String cDate, String cDescr, String lDescr, String cLocation) {

@@ -124,7 +124,10 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
                     viewCrimeDescription.setText("Crime description: " + crime.cDescr);
                     viewCrimeDescription.setVisibility(View.VISIBLE);
 
-                    Toast.makeText(context, "clicked marker", Toast.LENGTH_SHORT).show();// display toast
+                    crime.cRating += 1;
+                    dbHandling.updateCrime(crime);
+
+                    Toast.makeText(context, "rating: " + crime.cRating, Toast.LENGTH_SHORT).show();
                     Marker_clicked = true;
                 } else {
                     Button buttonReviewCrime = (Button) view_global.findViewById(R.id.buttonReviewCrime);
@@ -136,7 +139,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
                     Marker_clicked = false;
                 }
 
-                // if (!MainActivity.crimes.isEmpty())
+                // if (!MainActivity.crimeList.isEmpty())
 
                 return true;
             }

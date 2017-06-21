@@ -72,10 +72,10 @@ public class MapHandling {
                             .strokeColor(Color.argb(255, 0, 155, 255)).strokeWidth(2));
 
                     if (showCrimes) {
-                        if (!MainActivity.crimes.isEmpty()) {
+                        if (!MainActivity.crimeList.isEmpty()) {
                             MainActivity.crimesShown = true;
                             Location crimeLocation = new Location("crime");
-                            for (CrimeInfo crime : MainActivity.crimes) {
+                            for (CrimeInfo crime : MainActivity.crimeList) {
                                 String[] coord = crime.cLocation.replace(",", "").split(" ");
                                 crimeLocation.setLatitude(Double.parseDouble(coord[0]));
                                 crimeLocation.setLongitude(Double.parseDouble(coord[1]));
@@ -90,7 +90,7 @@ public class MapHandling {
                                                     getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
                                             .title(crime.cType)
                                             .snippet(crime.cDate));
-                                    mapMarkersCrimes.put(crimeMarker.getId(), MainActivity.crimes.indexOf(crime));
+                                    mapMarkersCrimes.put(crimeMarker.getId(), MainActivity.crimeList.indexOf(crime));
                                 }
                             }
                         } else {
@@ -115,7 +115,7 @@ public class MapHandling {
     }
 
     public CrimeInfo getMarkerCrimeInfo(String mId) {
-        return MainActivity.crimes.get(mapMarkersCrimes.get(mId));
+        return MainActivity.crimeList.get(mapMarkersCrimes.get(mId));
     }
 
     public Location getCurrentLocation() {
