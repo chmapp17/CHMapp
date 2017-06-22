@@ -19,6 +19,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
@@ -35,8 +36,10 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
 
     private Context context;
     private GoogleMap viewcMap;
-    private MapHandling mapHandling = new MapHandling();
-    private DataBaseHandling dbHandling = new DataBaseHandling();
+    private CameraPosition currentCameraPosition;
+    private CameraPosition previousCameraPosition;
+    private MapHandling mapHandling;
+    private DataBaseHandling dbHandling;
     private View view_global;
     private boolean Marker_clicked = false;
     private String Marker_id = "";
@@ -50,7 +53,8 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view_global = inflater.inflate(R.layout.fragment_view_crimes, container, false);
-        MainActivity.crimesShown = false;
+        dbHandling = new DataBaseHandling();
+
         Button buttonReviewCrime = (Button) view_global.findViewById(R.id.buttonReviewCrime);
         buttonReviewCrime.setVisibility(View.GONE);
         TextView viewCrimeDescription = (TextView) view_global.findViewById(R.id.viewCrimeDescription);
@@ -82,8 +86,19 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         viewcMap = googleMap;
-        if (!MainActivity.crimesShown)
-            mapHandling.updateLocation(context, viewcMap, true);
+        mapHandling = new MapHandling(viewcMap);
+        mapHandling.updateLocation(context, true);
+        viewcMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                currentCameraPosition = viewcMap.getCameraPosition();
+                if (!currentCameraPosition.equals(previousCameraPosition) && currentCameraPosition.zoom != 2) {
+                    mapHandling.updateLocation(context, false);
+                    mapHandling.showCrimes(context);
+                }
+                previousCameraPosition = currentCameraPosition;
+            }
+        });
 
         viewcMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 

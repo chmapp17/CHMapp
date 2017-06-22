@@ -33,13 +33,13 @@ public class MainActivity extends AppCompatActivity {
 
     private Fragment fragment;
     private FragmentManager fragmentManager;
-    private FragmentTransaction transaction;
+    private FragmentTransaction fragmentTransaction;
+    private WifiManager wifiManager;
     private ScheduledExecutorService scheduleWiFiScan;
     private DataBaseHandling dbHandling = new DataBaseHandling();
-    public static boolean crimesShown;
+    public static List<ScanResult> networkList;
     public static ArrayList<CrimeInfo> crimeList = new ArrayList<>();
     public static HashMap<Integer, String> mapCrimesKeys = new HashMap<>();
-    public static List<ScanResult> networkList;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -50,22 +50,22 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_home:
                     if (fragmentManager.findFragmentByTag("home") == null) {
                         fragment = new HomeFragment();
-                        transaction = fragmentManager.beginTransaction();
-                        transaction.replace(R.id.content, fragment, "home").commit();
+                        fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.content, fragment, "home").commit();
                     }
                     break;
                 case R.id.navigation_viewcrimes:
                     if (fragmentManager.findFragmentByTag("viewc") == null) {
                         fragment = new ViewCrimesFragment();
-                        transaction = fragmentManager.beginTransaction();
-                        transaction.replace(R.id.content, fragment, "viewc").commit();
+                        fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.content, fragment, "viewc").commit();
                     }
                     break;
                 case R.id.navigation_addcrime:
                     if (fragmentManager.findFragmentByTag("addc") == null) {
                         fragment = new AddCrimeFragment();
-                        transaction = fragmentManager.beginTransaction();
-                        transaction.replace(R.id.content, fragment, "addc").commit();
+                        fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.content, fragment, "addc").commit();
                     }
                     break;
             }
@@ -83,15 +83,13 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager = getSupportFragmentManager();
 
         fragment = new HomeFragment();
-        transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.content, fragment, "home").commit();
+        fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content, fragment, "home").commit();
 
         dbHandling.readData();
 
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         registerReceiver(new BroadcastReceiver() {
-            final WifiManager wifiManager = (WifiManager) getApplicationContext()
-                    .getSystemService(Context.WIFI_SERVICE);
-
             @Override
             public void onReceive(Context context, Intent intent) {
                 MainActivity.networkList = wifiManager.getScanResults();
@@ -125,8 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            final WifiManager wifiManager = (WifiManager) getApplicationContext()
-                    .getSystemService(Context.WIFI_SERVICE);
             if (!wifiManager.isWifiEnabled()) {
                 handler.post(new Runnable() {
                     public void run() {

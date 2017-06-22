@@ -19,9 +19,14 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import chmapp17.chmapp.MainActivity;
@@ -31,13 +36,21 @@ import chmapp17.chmapp.geolocation.GeoLocation;
 
 public class MapHandling {
 
-    private Location currentLocation;
+    private GoogleMap googleMap;
+    private TileOverlay crimeHeatOverlay;
     private Marker bluedotMarker;
     private Circle accuracyCircle;
-    private int crimeRadius = 3000;
-    private HashMap<String, Integer> mapMarkersCrimes = new HashMap<>();
+    private Location currentLocation;
+    private ArrayList<LatLng> shownCrimesLocations;
+    private HashMap<String, Integer> mapMarkersCrimes;
 
-    public void updateLocation(final Context context, final GoogleMap googleMap, final boolean showCrimes) {
+    public MapHandling(GoogleMap googleMap) {
+        this.googleMap = googleMap;
+        shownCrimesLocations = new ArrayList<>();
+        mapMarkersCrimes = new HashMap<>();
+    }
+
+    public void updateLocation(final Context context, final boolean moveCamera) {
         if (MainActivity.isNetworkAvailable(context)) {
             final GeoLocation geoLocation = new GeoLocation();
             new AsyncTask<Void, Void, Location>() {
@@ -55,14 +68,6 @@ public class MapHandling {
                         accuracyCircle.remove();
                     }
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    float currZoom = googleMap.getCameraPosition().zoom;
-                    if (currZoom == 2) {
-                        googleMap.moveCamera(CameraUpdateFactory
-                                .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, 16)));
-                    } else {
-                        googleMap.moveCamera(CameraUpdateFactory
-                                .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, currZoom)));
-                    }
                     bluedotMarker = googleMap.addMarker(new MarkerOptions()
                             .position(latLng).anchor(0.5f, 0.5f)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
@@ -70,31 +75,14 @@ public class MapHandling {
                             .center(latLng).radius(location.getAccuracy())
                             .fillColor(Color.argb(30, 0, 155, 255))
                             .strokeColor(Color.argb(255, 0, 155, 255)).strokeWidth(2));
-
-                    if (showCrimes) {
-                        if (!MainActivity.crimeList.isEmpty()) {
-                            MainActivity.crimesShown = true;
-                            Location crimeLocation = new Location("crime");
-                            for (CrimeInfo crime : MainActivity.crimeList) {
-                                String[] coord = crime.cLocation.replace(",", "").split(" ");
-                                crimeLocation.setLatitude(Double.parseDouble(coord[0]));
-                                crimeLocation.setLongitude(Double.parseDouble(coord[1]));
-                                if (currentLocation != null &&
-                                        currentLocation.distanceTo(crimeLocation) < crimeRadius) {
-                                    int drawable_id = crime.getCrimeDrawableID(context, crime.cType, "pin");
-                                    Marker crimeMarker = googleMap.addMarker(new MarkerOptions()
-                                            .position(new LatLng(crimeLocation.getLatitude(),
-                                                    crimeLocation.getLongitude()))
-                                            .icon(drawable_id == 0 ?
-                                                    BitmapDescriptorFactory.defaultMarker() :
-                                                    getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
-                                            .title(crime.cType)
-                                            .snippet(crime.cDate));
-                                    mapMarkersCrimes.put(crimeMarker.getId(), MainActivity.crimeList.indexOf(crime));
-                                }
-                            }
+                    if (moveCamera) {
+                        float currZoom = googleMap.getCameraPosition().zoom;
+                        if (currZoom == 2) {
+                            googleMap.moveCamera(CameraUpdateFactory
+                                    .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, 16)));
                         } else {
-                            Toast.makeText(context, "Waiting for crime data", Toast.LENGTH_SHORT).show();
+                            googleMap.moveCamera(CameraUpdateFactory
+                                    .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, currZoom)));
                         }
                     }
                 }
@@ -102,6 +90,53 @@ public class MapHandling {
         } else {
             Toast.makeText(context, "No Internet Connection", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void showCrimes(Context context) {
+        if (!MainActivity.crimeList.isEmpty()) {
+            LatLngBounds mapBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
+            for (CrimeInfo crime : MainActivity.crimeList) {
+                String[] coord = crime.cLocation.replace(",", "").split(" ");
+                LatLng crimeLocation
+                        = new LatLng(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]));
+                if (mapBounds.contains(crimeLocation) && !shownCrimesLocations.contains(crimeLocation)) {
+                    shownCrimesLocations.add(crimeLocation);
+                    int drawable_id = crime.getCrimeDrawableID(context, crime.cType, "pin");
+                    Marker crimeMarker = googleMap.addMarker(new MarkerOptions()
+                            .position(crimeLocation)
+                            .icon(drawable_id == 0 ?
+                                    BitmapDescriptorFactory.defaultMarker() :
+                                    getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
+                            .title(crime.cType)
+                            .snippet(crime.cDate));
+                    mapMarkersCrimes.put(crimeMarker.getId(), MainActivity.crimeList.indexOf(crime));
+                }
+            }
+        } else {
+            Toast.makeText(context, "Waiting for crime data", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void addCrimeHeatOverlay() {
+        if (!shownCrimesLocations.isEmpty() && crimeHeatOverlay == null) {
+            HeatmapTileProvider heatmapProvider
+                    = new HeatmapTileProvider.Builder().data(shownCrimesLocations).build();
+            crimeHeatOverlay = googleMap.addTileOverlay
+                    (new TileOverlayOptions().tileProvider(heatmapProvider));
+        }
+    }
+
+    public void removeCrimeHeatOverlay() {
+        if (crimeHeatOverlay != null)
+            crimeHeatOverlay.remove();
+    }
+
+    public CrimeInfo getMarkerCrimeInfo(String mId) {
+        return MainActivity.crimeList.get(mapMarkersCrimes.get(mId));
+    }
+
+    public Location getCurrentLocation() {
+        return currentLocation;
     }
 
     public BitmapDescriptor getMarkerIconFromDrawable(Drawable drawable) {
@@ -112,13 +147,5 @@ public class MapHandling {
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         drawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
-
-    public CrimeInfo getMarkerCrimeInfo(String mId) {
-        return MainActivity.crimeList.get(mapMarkersCrimes.get(mId));
-    }
-
-    public Location getCurrentLocation() {
-        return currentLocation;
     }
 }

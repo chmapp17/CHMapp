@@ -21,6 +21,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -39,13 +40,16 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
 
     private Context context;
     private GoogleMap addcMap;
-    private MapHandling mapHandling = new MapHandling();
-    private DataBaseHandling dbHandling = new DataBaseHandling();
+    private CameraPosition currentCameraPosition;
+    private CameraPosition previousCameraPosition;
+    private MapHandling mapHandling;
+    private DataBaseHandling dbHandling;
     private ScheduledExecutorService scheduleUpdateLocation;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_crime, container, false);
+        dbHandling = new DataBaseHandling();
 
         Switch autoLocationSwitch = (Switch) view.findViewById(R.id.autoLocationSwitch);
         autoLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -66,7 +70,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
         myLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mapHandling.updateLocation(context, addcMap, false);
+                mapHandling.updateLocation(context, true);
             }
         });
 
@@ -108,7 +112,6 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        MainActivity.crimesShown = false;
         return view;
     }
 
@@ -131,15 +134,25 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         addcMap = googleMap;
-        if (!MainActivity.crimesShown)
-            mapHandling.updateLocation(context, addcMap, true);
-
+        mapHandling = new MapHandling(addcMap);
+        mapHandling.updateLocation(context, true);
+        addcMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                currentCameraPosition = addcMap.getCameraPosition();
+                if (!currentCameraPosition.equals(previousCameraPosition) && currentCameraPosition.zoom != 2) {
+                    mapHandling.updateLocation(context, false);
+                    mapHandling.showCrimes(context);
+                }
+                previousCameraPosition = currentCameraPosition;
+            }
+        });
     }
 
     protected Runnable autoUpdateLocation = new Runnable() {
         @Override
         public void run() {
-            mapHandling.updateLocation(context, addcMap, false);
+            mapHandling.updateLocation(context, true);
         }
     };
 }
