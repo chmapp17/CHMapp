@@ -27,11 +27,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import chmapp17.chmapp.database.CrimeInfo;
+import chmapp17.chmapp.database.CrimeReview;
 import chmapp17.chmapp.database.DataBaseHandling;
+import chmapp17.chmapp.database.UsersInfo;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Fragment fragment;
+    private Fragment fragmentHome;
+    private Fragment fragmentView;
+    private Fragment fragmentAdd;
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
     private WifiManager wifiManager;
@@ -40,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     public static List<ScanResult> networkList;
     public static ArrayList<CrimeInfo> crimeList = new ArrayList<>();
     public static HashMap<Integer, String> mapCrimesKeys = new HashMap<>();
+    public static ArrayList<UsersInfo> userList = new ArrayList<>();
+    public static ArrayList<CrimeReview> reviewList = new ArrayList<>();
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -49,23 +55,26 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     if (fragmentManager.findFragmentByTag("home") == null) {
-                        fragment = new HomeFragment();
+                        if(fragmentHome == null)
+                            fragmentHome = new HomeFragment();//new SignupActivity();
                         fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.content, fragment, "home").commit();
+                        fragmentTransaction.replace(R.id.content, fragmentHome, "home").commit();
                     }
                     break;
                 case R.id.navigation_viewcrimes:
                     if (fragmentManager.findFragmentByTag("viewc") == null) {
-                        fragment = new ViewCrimesFragment();
+                        if(fragmentView == null)
+                            fragmentView = new ViewCrimesFragment();
                         fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.content, fragment, "viewc").commit();
+                        fragmentTransaction.replace(R.id.content, fragmentView, "viewc").commit();
                     }
                     break;
                 case R.id.navigation_addcrime:
                     if (fragmentManager.findFragmentByTag("addc") == null) {
-                        fragment = new AddCrimeFragment();
+                        if(fragmentAdd == null)
+                            fragmentAdd = new AddCrimeFragment();
                         fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.content, fragment, "addc").commit();
+                        fragmentTransaction.replace(R.id.content, fragmentAdd, "addc").commit();
                     }
                     break;
             }
@@ -82,9 +91,9 @@ public class MainActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         fragmentManager = getSupportFragmentManager();
 
-        fragment = new HomeFragment();
+        fragmentHome = new HomeFragment();
         fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content, fragment, "home").commit();
+        fragmentTransaction.replace(R.id.content, fragmentHome, "home").commit();
 
         dbHandling.readData();
 

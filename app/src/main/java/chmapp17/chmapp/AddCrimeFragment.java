@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -39,6 +40,7 @@ import chmapp17.chmapp.map.MapHandling;
 public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
 
     private Context context;
+    private FirebaseAuth auth;
     private GoogleMap addcMap;
     private CameraPosition currentCameraPosition;
     private CameraPosition previousCameraPosition;
@@ -50,6 +52,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_crime, container, false);
         dbHandling = new DataBaseHandling();
+        auth = FirebaseAuth.getInstance();
 
         Switch autoLocationSwitch = (Switch) view.findViewById(R.id.autoLocationSwitch);
         autoLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -92,24 +95,31 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
             @Override
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             public void onClick(View v) {
-                double lat = mapHandling.getCurrentLocation().getLatitude();
-                double lng = mapHandling.getCurrentLocation().getLongitude();
-                CrimeInfo crime = new CrimeInfo(spinnerCrimes.getSelectedItem().toString(),
-                        editDate.getText().toString(),
-                        editCrimeDescr.getText().toString(),
-                        editLocationDescr.getText().toString(),
-                        lat + ", " + lng);
-                dbHandling.addCrime(crime);
-                int drawable_id = crime.getCrimeDrawableID(context, crime.cType, "pin");
-                addcMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(lat, lng))
-                        .icon(drawable_id == 0 ?
-                                BitmapDescriptorFactory.defaultMarker() :
-                                mapHandling.getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
-                        .title(crime.cType)
-                        .snippet(crime.cDate));
-                Toast.makeText(context, "Crime added", Toast.LENGTH_SHORT).show();
-            }
+                if (auth.getCurrentUser() != null) {
+                    double lat = mapHandling.getCurrentLocation().getLatitude();
+                    double lng = mapHandling.getCurrentLocation().getLongitude();
+                    CrimeInfo crime = new CrimeInfo(spinnerCrimes.getSelectedItem().toString(),
+                            editDate.getText().toString(),
+                            editCrimeDescr.getText().toString(),
+                            editLocationDescr.getText().toString(),
+                            lat + ", " + lng,
+                            auth.getCurrentUser().getUid());
+                    dbHandling.addCrime(crime);
+                    int drawable_id = crime.getCrimeDrawableID(context, crime.cType, "pin");
+                    addcMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(lat, lng))
+                            .icon(drawable_id == 0 ?
+                                    BitmapDescriptorFactory.defaultMarker() :
+                                    mapHandling.getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
+                            .title(crime.cType)
+                            .snippet(crime.cDate));
+                    Toast.makeText(context, "Crime added", Toast.LENGTH_SHORT).show();
+                }
+                else
+                    {
+                        Toast.makeText(context, "Crime not added. Please login first!", Toast.LENGTH_SHORT).show();
+                }
+        }
         });
 
         return view;

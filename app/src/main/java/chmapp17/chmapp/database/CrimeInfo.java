@@ -6,19 +6,21 @@ import chmapp17.chmapp.R;
 
 public class CrimeInfo {
 
-    public String cType, cDate, cDescr, lDescr, cLocation;
-    public int cRating = 0;
+    public String cId, cType, cDate, cDescr, lDescr, cLocation, uId;
+    public float cRating = 0;
+    public boolean toCalcRating = false;
 
     public CrimeInfo() {
         // Default constructor required for calls to DataSnapshot.getValue(CrimeInfo.class)
     }
 
-    public CrimeInfo(String cType, String cDate, String cDescr, String lDescr, String cLocation) {
+    public CrimeInfo(String cType, String cDate, String cDescr, String lDescr, String cLocation, String uId) {
         this.cType = cType;
         this.cDate = cDate;
         this.cDescr = cDescr;
         this.lDescr = lDescr;
         this.cLocation = cLocation;
+        this.uId = uId;
     }
 
     public int getCrimeDrawableID(Context context, String cType, String dType) {

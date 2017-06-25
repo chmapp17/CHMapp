@@ -69,6 +69,7 @@ public class MapHandling {
                     }
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                     bluedotMarker = googleMap.addMarker(new MarkerOptions()
+                            .title(context.getResources().getString(R.string.CurrentLocationMarker))
                             .position(latLng).anchor(0.5f, 0.5f)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
                     accuracyCircle = googleMap.addCircle(new CircleOptions()
@@ -77,7 +78,7 @@ public class MapHandling {
                             .strokeColor(Color.argb(255, 0, 155, 255)).strokeWidth(2));
                     if (moveCamera) {
                         float currZoom = googleMap.getCameraPosition().zoom;
-                        if (currZoom == 2) {
+                        if (currZoom == 2 || currZoom == 3) {
                             googleMap.moveCamera(CameraUpdateFactory
                                     .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, 16)));
                         } else {
