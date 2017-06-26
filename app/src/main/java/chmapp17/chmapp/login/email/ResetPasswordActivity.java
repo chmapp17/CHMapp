@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +21,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+
 import chmapp17.chmapp.R;
 
 public class ResetPasswordActivity extends Fragment {
@@ -32,6 +32,7 @@ public class ResetPasswordActivity extends Fragment {
     private ProgressBar progressBar;
     private View view;
     private Context rContext;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -81,7 +82,7 @@ public class ResetPasswordActivity extends Fragment {
                         });
             }
         });
-    return view;
+        return view;
     }
 
 }

@@ -12,8 +12,6 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import org.w3c.dom.Text;
-
 import chmapp17.chmapp.database.UsersInfo;
 import chmapp17.chmapp.login.email.LoginActivity;
 
@@ -23,6 +21,7 @@ public class HomeFragment extends Fragment {
     private Button emailSignIn, signout;
     private FirebaseAuth auth;
     private TextView user_name;
+
     //
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,7 +34,7 @@ public class HomeFragment extends Fragment {
             user_name = (TextView) view.findViewById(R.id.user_name);
             FirebaseUser user_details = auth.getCurrentUser();
             UsersInfo ui = GetUserData(user_details.getUid());
-            user_name.setText("Welcome to CHMap: "+ ui.user_name +"\nYour email is: "+ ui.user_email);
+            user_name.setText("Welcome to CHMap: " + ui.user_name + "\nYour email is: " + ui.user_email);
 
             signout = (Button) view.findViewById(R.id.sign_out_button);
             signout.setOnClickListener(new View.OnClickListener() {
@@ -46,9 +45,7 @@ public class HomeFragment extends Fragment {
                     fragmentManager.replace(R.id.content, new HomeFragment(), "home").commit();
                 }
             });
-        }
-        else
-        {
+        } else {
             view = inflater.inflate(R.layout.fragment_home_unsigned, container, false);
             emailSignIn = (Button) view.findViewById(R.id.email_sign_in_button);
 
@@ -66,12 +63,12 @@ public class HomeFragment extends Fragment {
 
         return view;
     }
-    public UsersInfo GetUserData(String Uid)
-    {
-        UsersInfo ui = new UsersInfo("UserInvalid","UserInvalid","UserInvalid");
+
+    public UsersInfo GetUserData(String Uid) {
+        UsersInfo ui = new UsersInfo("UserInvalid", "UserInvalid", "UserInvalid");
         for (UsersInfo user : MainActivity.userList) {
-        if(user.user_id.equals(Uid))
-            ui = new UsersInfo(user.user_name,user.user_email,user.user_id);
+            if (user.user_id.equals(Uid))
+                ui = new UsersInfo(user.user_name, user.user_email, user.user_id);
         }
 
         return ui;

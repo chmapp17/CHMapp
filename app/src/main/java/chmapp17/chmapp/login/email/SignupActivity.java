@@ -3,11 +3,8 @@ package chmapp17.chmapp.login.email;
 /**
  * Created by Edward on 6/23/2017.
  */
-import chmapp17.chmapp.HomeFragment;
-import chmapp17.chmapp.MainActivity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -26,20 +23,22 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+import chmapp17.chmapp.HomeFragment;
 import chmapp17.chmapp.R;
 import chmapp17.chmapp.database.DataBaseHandling;
 import chmapp17.chmapp.database.UsersInfo;
 
 public class SignupActivity extends Fragment {
 
-    private EditText inputEmail, inputPassword,inputUserName;
+    private EditText inputEmail, inputPassword, inputUserName;
     private Button btnSignIn, btnSignUp, btnResetPassword;
     private ProgressBar progressBar;
     private FirebaseAuth auth;
     private View view;
     private Context sContext;
     private DataBaseHandling dbHandling;
-    private String user_name,email;
+    private String user_name, email;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -119,7 +118,7 @@ public class SignupActivity extends Fragment {
                                     Toast.makeText(sContext, "Authentication failed." + task.getException(),
                                             Toast.LENGTH_SHORT).show();
                                 } else {
-                                    UsersInfo user_info = new UsersInfo(user_name,email,auth.getCurrentUser().getUid());
+                                    UsersInfo user_info = new UsersInfo(user_name, email, auth.getCurrentUser().getUid());
                                     dbHandling.addUser(user_info);
 
                                     final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();

@@ -6,7 +6,7 @@ import chmapp17.chmapp.R;
 
 public class CrimeInfo {
 
-    public String cId, cType, cDate, cDescr, lDescr, cLocation, uId;
+    public String cType, cDate, cDescr, lDescr, cLocation, uId;
     public float cRating = 0;
     public boolean toCalcRating = false;
 

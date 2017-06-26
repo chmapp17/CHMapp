@@ -1,4 +1,4 @@
-package chmapp17.chmapp;
+package chmapp17.chmapp.database;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,9 @@ public class DataListener {
     private static boolean myBoolean;
     private static List<DataBooleanChangedListener> listeners = new ArrayList<DataBooleanChangedListener>();
 
-    public static boolean getMyBoolean() { return myBoolean; }
+    public static boolean getMyBoolean() {
+        return myBoolean;
+    }
 
     public static void setMyBoolean(boolean value) {
         myBoolean = value;

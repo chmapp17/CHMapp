@@ -19,6 +19,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,10 +42,12 @@ public class MainActivity extends AppCompatActivity {
     private FragmentTransaction fragmentTransaction;
     private WifiManager wifiManager;
     private ScheduledExecutorService scheduleWiFiScan;
-    private DataBaseHandling dbHandling = new DataBaseHandling();
+    private FirebaseAuth auth;
+    private DataBaseHandling dbHandling;
     public static List<ScanResult> networkList;
     public static ArrayList<CrimeInfo> crimeList = new ArrayList<>();
     public static HashMap<Integer, String> mapCrimesKeys = new HashMap<>();
+    public static HashMap<String, Integer> mapKeysCrimes = new HashMap<>();
     public static ArrayList<UsersInfo> userList = new ArrayList<>();
     public static ArrayList<CrimeReview> reviewList = new ArrayList<>();
 
@@ -54,27 +58,26 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    if (fragmentManager.findFragmentByTag("home") == null) {
-                        if(fragmentHome == null)
-                            fragmentHome = new HomeFragment();//new SignupActivity();
-                        fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.content, fragmentHome, "home").commit();
-                    }
+                    if (fragmentHome == null)
+                        fragmentHome = new HomeFragment();//new SignupActivity();
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.content, fragmentHome, "home").commit();
                     break;
                 case R.id.navigation_viewcrimes:
-                    if (fragmentManager.findFragmentByTag("viewc") == null) {
-                        if(fragmentView == null)
-                            fragmentView = new ViewCrimesFragment();
-                        fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.content, fragmentView, "viewc").commit();
-                    }
+                    if (fragmentView == null)
+                        fragmentView = new ViewCrimesFragment();
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.content, fragmentView, "viewc").commit();
                     break;
                 case R.id.navigation_addcrime:
-                    if (fragmentManager.findFragmentByTag("addc") == null) {
-                        if(fragmentAdd == null)
+                    if (auth.getCurrentUser() != null) {
+                        if (fragmentAdd == null)
                             fragmentAdd = new AddCrimeFragment();
                         fragmentTransaction = fragmentManager.beginTransaction();
                         fragmentTransaction.replace(R.id.content, fragmentAdd, "addc").commit();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Please login first to add crimes",
+                                Toast.LENGTH_SHORT).show();
                     }
                     break;
             }
@@ -95,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.content, fragmentHome, "home").commit();
 
+        auth = FirebaseAuth.getInstance();
+        dbHandling = new DataBaseHandling();
         dbHandling.readData();
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);

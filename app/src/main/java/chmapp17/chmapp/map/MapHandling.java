@@ -38,9 +38,9 @@ public class MapHandling {
 
     private GoogleMap googleMap;
     private TileOverlay crimeHeatOverlay;
-    private Marker bluedotMarker;
-    private Circle accuracyCircle;
     private Location currentLocation;
+    private static Marker bluedotMarker;
+    private static Circle accuracyCircle;
     private ArrayList<LatLng> shownCrimesLocations;
     private HashMap<String, Integer> mapMarkersCrimes;
 
@@ -78,7 +78,7 @@ public class MapHandling {
                             .strokeColor(Color.argb(255, 0, 155, 255)).strokeWidth(2));
                     if (moveCamera) {
                         float currZoom = googleMap.getCameraPosition().zoom;
-                        if (currZoom == 2 || currZoom == 3) {
+                        if (currZoom == googleMap.getMinZoomLevel()) {
                             googleMap.moveCamera(CameraUpdateFactory
                                     .newCameraPosition(CameraPosition.fromLatLngZoom(latLng, 16)));
                         } else {

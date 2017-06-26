@@ -95,31 +95,25 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
             @Override
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             public void onClick(View v) {
-                if (auth.getCurrentUser() != null) {
-                    double lat = mapHandling.getCurrentLocation().getLatitude();
-                    double lng = mapHandling.getCurrentLocation().getLongitude();
-                    CrimeInfo crime = new CrimeInfo(spinnerCrimes.getSelectedItem().toString(),
-                            editDate.getText().toString(),
-                            editCrimeDescr.getText().toString(),
-                            editLocationDescr.getText().toString(),
-                            lat + ", " + lng,
-                            auth.getCurrentUser().getUid());
-                    dbHandling.addCrime(crime);
-                    int drawable_id = crime.getCrimeDrawableID(context, crime.cType, "pin");
-                    addcMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(lat, lng))
-                            .icon(drawable_id == 0 ?
-                                    BitmapDescriptorFactory.defaultMarker() :
-                                    mapHandling.getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
-                            .title(crime.cType)
-                            .snippet(crime.cDate));
-                    Toast.makeText(context, "Crime added", Toast.LENGTH_SHORT).show();
-                }
-                else
-                    {
-                        Toast.makeText(context, "Crime not added. Please login first!", Toast.LENGTH_SHORT).show();
-                }
-        }
+                double lat = mapHandling.getCurrentLocation().getLatitude();
+                double lng = mapHandling.getCurrentLocation().getLongitude();
+                CrimeInfo crime = new CrimeInfo(spinnerCrimes.getSelectedItem().toString(),
+                        editDate.getText().toString(),
+                        editCrimeDescr.getText().toString(),
+                        editLocationDescr.getText().toString(),
+                        lat + ", " + lng,
+                        auth.getCurrentUser().getUid());
+                dbHandling.addCrime(crime);
+                int drawable_id = crime.getCrimeDrawableID(context, crime.cType, "pin");
+                addcMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(lat, lng))
+                        .icon(drawable_id == 0 ?
+                                BitmapDescriptorFactory.defaultMarker() :
+                                mapHandling.getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
+                        .title(crime.cType)
+                        .snippet(crime.cDate));
+                Toast.makeText(context, "Crime added", Toast.LENGTH_SHORT).show();
+            }
         });
 
         return view;
@@ -150,7 +144,8 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onCameraIdle() {
                 currentCameraPosition = addcMap.getCameraPosition();
-                if (!currentCameraPosition.equals(previousCameraPosition) && currentCameraPosition.zoom != 2) {
+                if (!currentCameraPosition.equals(previousCameraPosition) &&
+                        currentCameraPosition.zoom != addcMap.getMinZoomLevel()) {
                     mapHandling.updateLocation(context, false);
                     mapHandling.showCrimes(context);
                 }

@@ -3,19 +3,12 @@ package chmapp17.chmapp.login.email;
 /**
  * Created by Edward on 6/24/2017.
  */
-import chmapp17.chmapp.HomeFragment;
-import chmapp17.chmapp.MainActivity;
-import chmapp17.chmapp.R;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +23,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+import chmapp17.chmapp.HomeFragment;
+import chmapp17.chmapp.R;
+
 public class LoginActivity extends Fragment {
 
     private EditText inputEmail, inputPassword;
@@ -38,6 +34,7 @@ public class LoginActivity extends Fragment {
     private Button btnSignup, btnLogin, btnReset;
     private Context lContext;
     private View view;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -122,6 +119,6 @@ public class LoginActivity extends Fragment {
                         });
             }
         });
-    return view;
+        return view;
     }
 }
