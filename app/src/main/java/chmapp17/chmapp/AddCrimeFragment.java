@@ -17,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -39,6 +40,7 @@ import chmapp17.chmapp.map.MapHandling;
 
 public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
 
+    private View view;
     private Context context;
     private FirebaseAuth auth;
     private GoogleMap addcMap;
@@ -50,7 +52,8 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_add_crime, container, false);
+        view = inflater.inflate(R.layout.fragment_add_crime, container, false);
+        context = getContext();
         dbHandling = new DataBaseHandling();
         auth = FirebaseAuth.getInstance();
 
@@ -65,6 +68,34 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
                 } else {
                     if (scheduleUpdateLocation != null)
                         scheduleUpdateLocation.shutdown();
+                }
+            }
+        });
+
+        final Switch crimeHeatSwitch = (Switch) view.findViewById(R.id.crimeHeatSwitch);
+        crimeHeatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton cb, boolean on) {
+                addcMap.clear();
+                if (on) {
+                    mapHandling.addCrimeHeatOverlay();
+                } else {
+                    mapHandling.removeCrimeHeatOverlay();
+                    mapHandling.showCrimes(context, true);
+                    mapHandling.updateLocation(context, false);
+                }
+            }
+        });
+        crimeHeatSwitch.setOnClickListener(new View.OnClickListener() {
+            float savedZoom = 0;
+
+            @Override
+            public void onClick(View v) {
+                if (crimeHeatSwitch.isChecked() && currentCameraPosition.zoom > 10) {
+                    savedZoom = currentCameraPosition.zoom;
+                    addcMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+                } else {
+                    addcMap.animateCamera(CameraUpdateFactory.zoomTo(savedZoom));
                 }
             }
         });
@@ -122,7 +153,6 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onStart() {
         super.onStart();
-        context = getContext();
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.addcMapFragment);
         mapFragment.getMapAsync(this);
@@ -141,13 +171,21 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
         mapHandling = new MapHandling(addcMap);
         mapHandling.updateLocation(context, true);
         addcMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            Switch crimeHeatSwitch = (Switch) view.findViewById(R.id.crimeHeatSwitch);
+
             @Override
             public void onCameraIdle() {
                 currentCameraPosition = addcMap.getCameraPosition();
                 if (!currentCameraPosition.equals(previousCameraPosition) &&
                         currentCameraPosition.zoom != addcMap.getMinZoomLevel()) {
-                    mapHandling.updateLocation(context, false);
-                    mapHandling.showCrimes(context);
+                    if (currentCameraPosition.zoom <= 10)
+                        crimeHeatSwitch.setChecked(true);
+                    else
+                        crimeHeatSwitch.setChecked(false);
+                    if (crimeHeatSwitch.isChecked())
+                        mapHandling.addCrimeHeatOverlay();
+                    else
+                        mapHandling.showCrimes(context, false);
                 }
                 previousCameraPosition = currentCameraPosition;
             }
@@ -157,7 +195,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     protected Runnable autoUpdateLocation = new Runnable() {
         @Override
         public void run() {
-            mapHandling.updateLocation(context, true);
+            mapHandling.updateLocation(context, false);
         }
     };
 }

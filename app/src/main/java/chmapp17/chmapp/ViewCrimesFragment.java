@@ -162,8 +162,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
                 currentCameraPosition = viewcMap.getCameraPosition();
                 if (!currentCameraPosition.equals(previousCameraPosition) &&
                         currentCameraPosition.zoom != viewcMap.getMinZoomLevel()) {
-                    mapHandling.updateLocation(context, false);
-                    mapHandling.showCrimes(context);
+                    mapHandling.showCrimes(context, false);
                 }
                 previousCameraPosition = currentCameraPosition;
             }
@@ -191,8 +190,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
 
             @Override
             public boolean onMarkerClick(Marker arg0) {
-                // if(arg0.getTitle().equals("MyHome")) // if marker source is clicked
-                if (!arg0.getTitle().toString().equals(context.getResources().getString(R.string.CurrentLocationMarker))) {
+                if (!arg0.getTitle().equals("My location")) {
                     if (!Marker_id.contentEquals(arg0.getId()))
                         Marker_clicked = false;
 

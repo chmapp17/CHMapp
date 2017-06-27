@@ -12,15 +12,12 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import chmapp17.chmapp.database.UsersInfo;
 import chmapp17.chmapp.login.email.LoginActivity;
 
 public class HomeFragment extends Fragment {
 
     private View view;
-    private Button emailSignIn, signout;
     private FirebaseAuth auth;
-    private TextView user_name;
 
     //
     @Override
@@ -31,12 +28,12 @@ public class HomeFragment extends Fragment {
         if (auth.getCurrentUser() != null) {
             //do view
             view = inflater.inflate(R.layout.fragment_home_signedin, container, false);
-            user_name = (TextView) view.findViewById(R.id.user_name);
-            FirebaseUser user_details = auth.getCurrentUser();
-            UsersInfo ui = GetUserData(user_details.getUid());
-            user_name.setText("Welcome to CHMap: " + ui.user_name + "\nYour email is: " + ui.user_email);
+            TextView user_name = (TextView) view.findViewById(R.id.user_name);
+            FirebaseUser user = auth.getCurrentUser();
+            user_name.setText("Welcome to CHMap: " + user.getDisplayName() +
+                    "\nYour email is: " + user.getEmail());
 
-            signout = (Button) view.findViewById(R.id.sign_out_button);
+            Button signout = (Button) view.findViewById(R.id.sign_out_button);
             signout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -47,7 +44,7 @@ public class HomeFragment extends Fragment {
             });
         } else {
             view = inflater.inflate(R.layout.fragment_home_unsigned, container, false);
-            emailSignIn = (Button) view.findViewById(R.id.email_sign_in_button);
+            Button emailSignIn = (Button) view.findViewById(R.id.email_sign_in_button);
 
 
             emailSignIn.setOnClickListener(new View.OnClickListener() {
@@ -60,18 +57,7 @@ public class HomeFragment extends Fragment {
 
         }
 
-
         return view;
-    }
-
-    public UsersInfo GetUserData(String Uid) {
-        UsersInfo ui = new UsersInfo("UserInvalid", "UserInvalid", "UserInvalid");
-        for (UsersInfo user : MainActivity.userList) {
-            if (user.user_id.equals(Uid))
-                ui = new UsersInfo(user.user_name, user.user_email, user.user_id);
-        }
-
-        return ui;
     }
 
     @Override

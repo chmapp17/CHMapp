@@ -32,12 +32,18 @@ public class GeoLocation {
         try {
             toPost.put("cellTowers", CTobj);
             toPost.put("wifiAccessPoints", APobj);
-            JSONObject JResponse = new JSONObject(getServerResponse(toPost));
-            JSONObject locObject = JResponse.getJSONObject("location");
+            String jsonString = getServerResponse(toPost);
             location = new Location("");
-            location.setLatitude(locObject.getDouble("lat"));
-            location.setLongitude(locObject.getDouble("lng"));
-            location.setAccuracy((float) JResponse.getDouble("accuracy"));
+            if (!jsonString.equals("")) {
+                JSONObject JResponse = new JSONObject(jsonString);
+                JSONObject locObject = JResponse.getJSONObject("location");
+                location.setLatitude(locObject.getDouble("lat"));
+                location.setLongitude(locObject.getDouble("lng"));
+                location.setAccuracy((float) JResponse.getDouble("accuracy"));
+            } else {
+                location.setLatitude(Double.parseDouble("47.641262"));
+                location.setLongitude(Double.parseDouble("26.243181"));
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

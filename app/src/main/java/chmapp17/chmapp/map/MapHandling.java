@@ -69,7 +69,7 @@ public class MapHandling {
                     }
                     LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                     bluedotMarker = googleMap.addMarker(new MarkerOptions()
-                            .title(context.getResources().getString(R.string.CurrentLocationMarker))
+                            .title("My location")
                             .position(latLng).anchor(0.5f, 0.5f)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
                     accuracyCircle = googleMap.addCircle(new CircleOptions()
@@ -93,7 +93,9 @@ public class MapHandling {
         }
     }
 
-    public void showCrimes(Context context) {
+    public void showCrimes(Context context, boolean resetShownCrimes) {
+        if (resetShownCrimes)
+            shownCrimesLocations.clear();
         if (!MainActivity.crimeList.isEmpty()) {
             LatLngBounds mapBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
             for (CrimeInfo crime : MainActivity.crimeList) {
@@ -104,12 +106,12 @@ public class MapHandling {
                     shownCrimesLocations.add(crimeLocation);
                     int drawable_id = crime.getCrimeDrawableID(context, crime.cType, "pin");
                     Marker crimeMarker = googleMap.addMarker(new MarkerOptions()
+                            .title(crime.cType)
+                            .snippet(crime.cDate)
                             .position(crimeLocation)
                             .icon(drawable_id == 0 ?
                                     BitmapDescriptorFactory.defaultMarker() :
-                                    getMarkerIconFromDrawable(context.getDrawable(drawable_id)))
-                            .title(crime.cType)
-                            .snippet(crime.cDate));
+                                    getMarkerIconFromDrawable(context.getDrawable(drawable_id))));
                     mapMarkersCrimes.put(crimeMarker.getId(), MainActivity.crimeList.indexOf(crime));
                 }
             }
@@ -119,9 +121,18 @@ public class MapHandling {
     }
 
     public void addCrimeHeatOverlay() {
-        if (!shownCrimesLocations.isEmpty() && crimeHeatOverlay == null) {
+        ArrayList<LatLng> crimesLatLngs = new ArrayList<>();
+        LatLngBounds mapBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
+        for (CrimeInfo crime : MainActivity.crimeList) {
+            String[] coord = crime.cLocation.replace(",", "").split(" ");
+            LatLng crimeLocation
+                    = new LatLng(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]));
+            if (mapBounds.contains(crimeLocation))
+                crimesLatLngs.add(crimeLocation);
+        }
+        if (!crimesLatLngs.isEmpty()) {
             HeatmapTileProvider heatmapProvider
-                    = new HeatmapTileProvider.Builder().data(shownCrimesLocations).build();
+                    = new HeatmapTileProvider.Builder().data(crimesLatLngs).build();
             crimeHeatOverlay = googleMap.addTileOverlay
                     (new TileOverlayOptions().tileProvider(heatmapProvider));
         }

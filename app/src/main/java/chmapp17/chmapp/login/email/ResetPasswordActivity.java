@@ -1,9 +1,5 @@
 package chmapp17.chmapp.login.email;
 
-/**
- * Created by Edward on 6/23/2017.
- */
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,14 +27,14 @@ public class ResetPasswordActivity extends Fragment {
     private FirebaseAuth auth;
     private ProgressBar progressBar;
     private View view;
-    private Context rContext;
+    private Context context;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = inflater.inflate(R.layout.activity_reset_password, container, false);
-        rContext = getContext();
+        context = getContext();
 
         inputEmail = (EditText) view.findViewById(R.id.email);
         btnReset = (Button) view.findViewById(R.id.btn_reset_password);
@@ -62,7 +58,7 @@ public class ResetPasswordActivity extends Fragment {
                 String email = inputEmail.getText().toString().trim();
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(rContext, "Enter your registered email id", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Enter your registered email id", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -72,9 +68,9 @@ public class ResetPasswordActivity extends Fragment {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(rContext, "We have sent you instructions to reset your password!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "We have sent you instructions to reset your password!", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(rContext, "Failed to send reset email!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "Failed to send reset email!", Toast.LENGTH_SHORT).show();
                                 }
 
                                 progressBar.setVisibility(View.GONE);

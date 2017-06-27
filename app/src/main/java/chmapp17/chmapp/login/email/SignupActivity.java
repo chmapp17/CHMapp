@@ -1,9 +1,5 @@
 package chmapp17.chmapp.login.email;
 
-/**
- * Created by Edward on 6/23/2017.
- */
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,11 +18,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import chmapp17.chmapp.HomeFragment;
 import chmapp17.chmapp.R;
-import chmapp17.chmapp.database.DataBaseHandling;
-import chmapp17.chmapp.database.UsersInfo;
 
 public class SignupActivity extends Fragment {
 
@@ -34,22 +30,18 @@ public class SignupActivity extends Fragment {
     private Button btnSignIn, btnSignUp, btnResetPassword;
     private ProgressBar progressBar;
     private FirebaseAuth auth;
-    private View view;
-    private Context sContext;
-    private DataBaseHandling dbHandling;
+    private Context context;
     private String user_name, email;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sContext = getContext();
-        view = inflater.inflate(R.layout.activity_signup, container, false);
-        //view.inflater.inflate(R.layout.activity_signup, container, false);
+        context = getContext();
+        View view = inflater.inflate(R.layout.activity_signup, container, false);
 
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
-        dbHandling = new DataBaseHandling();
 
         btnSignIn = (Button) view.findViewById(R.id.sign_in_button);
         btnSignUp = (Button) view.findViewById(R.id.sign_up_button);
@@ -84,22 +76,22 @@ public class SignupActivity extends Fragment {
                 String password = inputPassword.getText().toString().trim();
 
                 if (TextUtils.isEmpty(user_name)) {
-                    Toast.makeText(sContext, "Enter user name!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Enter user name!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(sContext, "Enter email address!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Enter email address!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(sContext, "Enter password!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Enter password!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if (password.length() < 6) {
-                    Toast.makeText(sContext, "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -109,20 +101,23 @@ public class SignupActivity extends Fragment {
                         .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                Toast.makeText(sContext, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "createUserWithEmail:onComplete:" +
+                                        task.isSuccessful(), Toast.LENGTH_SHORT).show();
                                 progressBar.setVisibility(View.GONE);
                                 // If sign in fails, display a message to the user. If sign in succeeds
                                 // the auth state listener will be notified and logic to handle the
                                 // signed in user can be handled in the listener.
-                                if (!task.isSuccessful()) {
-                                    Toast.makeText(sContext, "Authentication failed." + task.getException(),
-                                            Toast.LENGTH_SHORT).show();
-                                } else {
-                                    UsersInfo user_info = new UsersInfo(user_name, email, auth.getCurrentUser().getUid());
-                                    dbHandling.addUser(user_info);
-
+                                if (task.isSuccessful()) {
+                                    FirebaseUser user = auth.getCurrentUser();
+                                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                            .setDisplayName(inputUserName.getText().toString())
+                                            .build();
+                                    user.updateProfile(profileUpdates);
                                     final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
                                     fragmentManager.replace(R.id.content, new HomeFragment(), "home").commit();
+                                } else {
+                                    Toast.makeText(context, "Authentication failed." + task.getException(),
+                                            Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });

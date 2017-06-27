@@ -3,7 +3,6 @@
     <string name="title_home">Home</string>
     <string name="title_viewcrimes">View crimes</string>
     <string name="title_addcrime">Add crime</string>
-    <string name="CurrentLocationMarker">currentMarker</string>
     <string-array name="crimes_array">
         <item>Arson</item>
         <item>Assault</item>

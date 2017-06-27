@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 import chmapp17.chmapp.database.CrimeInfo;
 import chmapp17.chmapp.database.CrimeReview;
 import chmapp17.chmapp.database.DataBaseHandling;
-import chmapp17.chmapp.database.UsersInfo;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     public static ArrayList<CrimeInfo> crimeList = new ArrayList<>();
     public static HashMap<Integer, String> mapCrimesKeys = new HashMap<>();
     public static HashMap<String, Integer> mapKeysCrimes = new HashMap<>();
-    public static ArrayList<UsersInfo> userList = new ArrayList<>();
     public static ArrayList<CrimeReview> reviewList = new ArrayList<>();
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -59,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     if (fragmentHome == null)
-                        fragmentHome = new HomeFragment();//new SignupActivity();
+                        fragmentHome = new HomeFragment();
                     fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.replace(R.id.content, fragmentHome, "home").commit();
                     break;

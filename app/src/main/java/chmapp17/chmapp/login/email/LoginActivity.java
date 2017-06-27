@@ -1,9 +1,5 @@
 package chmapp17.chmapp.login.email;
 
-/**
- * Created by Edward on 6/24/2017.
- */
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,7 +28,7 @@ public class LoginActivity extends Fragment {
     private FirebaseAuth auth;
     private ProgressBar progressBar;
     private Button btnSignup, btnLogin, btnReset;
-    private Context lContext;
+    private Context context;
     private View view;
 
     @Override
@@ -40,7 +36,7 @@ public class LoginActivity extends Fragment {
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = inflater.inflate(R.layout.activity_login, container, false);
-        lContext = getContext();
+        context = getContext();
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
         //to delete this after test
@@ -84,12 +80,12 @@ public class LoginActivity extends Fragment {
                 final String password = inputPassword.getText().toString();
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(lContext, "Enter email address!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Enter email address!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(lContext, "Enter password!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Enter password!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -109,7 +105,7 @@ public class LoginActivity extends Fragment {
                                     if (password.length() < 6) {
                                         inputPassword.setError(getString(R.string.minimum_password));
                                     } else {
-                                        Toast.makeText(lContext, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
+                                        Toast.makeText(context, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
                                     }
                                 } else {
                                     final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();

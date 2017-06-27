@@ -3,9 +3,6 @@ package chmapp17.chmapp.database;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by ioan.mihailiuc on 6/21/2017.
- */
 interface DataBooleanChangedListener {
     public void OnMyBooleanChanged();
 }

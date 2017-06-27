@@ -11,7 +11,6 @@ import chmapp17.chmapp.MainActivity;
 public class DataBaseHandling {
 
     private DatabaseReference dbCrimes = FirebaseDatabase.getInstance().getReference("crimes");
-    private DatabaseReference dbUsers = FirebaseDatabase.getInstance().getReference("users");
     private DatabaseReference dbReviews = FirebaseDatabase.getInstance().getReference("reviews");
 
     public void readData() {
@@ -40,35 +39,6 @@ public class DataBaseHandling {
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
                 // ...
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("DataBaseError: " + databaseError.getCode());
-            }
-        });
-        dbUsers.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                // Retrieve lists of items or listen for additions to a list of items.
-                // This callback is triggered once for each existing child and then again
-                // every time a new child is added to the specified path.
-                MainActivity.userList.add(dataSnapshot.getValue(UsersInfo.class));
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
@@ -122,10 +92,6 @@ public class DataBaseHandling {
 
     public CrimeInfo getCrimeByKey(String key) {
         return MainActivity.crimeList.get(MainActivity.mapKeysCrimes.get(key));
-    }
-
-    public void addUser(UsersInfo user_info) {
-        dbUsers.push().setValue(user_info);
     }
 
     public void addReview(CrimeReview cReview) {
