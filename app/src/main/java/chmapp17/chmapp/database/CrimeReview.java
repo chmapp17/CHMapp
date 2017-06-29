@@ -1,16 +1,14 @@
 package chmapp17.chmapp.database;
 
 public class CrimeReview {
-    public String cId, uId, rId;
-    public int cStars;
+    public String uId;
+    public boolean HasUpVoted = false;
 
     public CrimeReview() {
     }
 
-    public CrimeReview(String cId, String uId, int cStars) {
-        this.cId = cId;
+    public CrimeReview(String uId, boolean HasUpVoted) {
         this.uId = uId;
-        this.cStars = cStars;
-
+        this.HasUpVoted = HasUpVoted;
     }
 }

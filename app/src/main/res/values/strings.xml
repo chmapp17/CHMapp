@@ -27,7 +27,9 @@
         <item>4 Stars</item>
         <item>5 Stars</item>
     </string-array>
+    <string name="sha1_debug">14:0B:C8:33:0D:C3:AA:ED:06:BB:9B:71:CC:96:A8:1E:AE:A8:9E:BA</string>
     <string name="action_sign_in_short">Register</string>
+    <string name="web_client_id">816111951990-kqa6rn8n5oeo6et6dgkutjvbjr0o00c4.apps.googleusercontent.com</string>
     <string name="email">Email</string>
     <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
     <string name="auth_failed">Authentication failed, check your email and password or sign up</string>

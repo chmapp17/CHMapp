@@ -3,34 +3,72 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="chmapp17.chmapp.HomeFragment">
+    android:background="@color/colorPrimaryDark"
+    tools:context="chmapp17.chmapp.HomeFragment"
+    android:layout_weight="3">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+        <ImageView
+            android:id="@+id/unsigned_image1"
+            android:src="@drawable/hat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
 
+    </LinearLayout>
         <LinearLayout
             android:id="@+id/home_unsigned"
+            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorPrimaryDark"
             android:orientation="vertical">
 
             <Button
-                android:padding="20dp"
+                android:padding="10dp"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:id="@+id/email_sign_in_button"
-                style="?android:textAppearanceSmall"
-                android:layout_gravity="center_vertical"
-                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:layout_width="350dp"
                 android:layout_height="wrap_content"
+                android:textSize="20sp"
                 android:layout_marginTop="16dp"
                 android:text="Sign in with Email"
                 android:textStyle="bold" />
 
             <com.google.android.gms.common.SignInButton
                 android:padding="10dp"
-                android:id="@+id/sign_in_button"
-                android:layout_width="match_parent"
+                android:id="@+id/gmail_sign_in"
+                android:layout_width="370dp"
+                android:textSize="20sp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+                android:layout_gravity="center"
                 />
+            <Button
+                android:padding="10dp"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:id="@+id/anoymous_sign_in_button"
+                android:layout_gravity="center"
+                android:layout_width="350dp"
+                android:textSize="20sp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Sign in as Anonymous"
+                android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <ImageView
+                android:id="@+id/unsigned_image2"
+                android:src="@drawable/hat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
         </LinearLayout>
 
 </LinearLayout>

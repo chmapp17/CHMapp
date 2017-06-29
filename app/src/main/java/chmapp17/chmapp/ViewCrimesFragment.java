@@ -13,10 +13,9 @@ import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,12 +53,13 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
     private String Marker_id = "";
     private CrimeReview cReviewUpdate;
     //Buttons
-    private Spinner spinnerReview;
-    private Button buttonReviewCrime;
-    private TextView viewCrimeDescription, viewCrimeType, viewCrimeReviews, viewCrimeReviewText;
+    private Button buttonReviewUp, buttonReviewDown;
+    private ImageView viewCrimeIcon;
+    private TextView viewCrimeDescription, viewCrimeType, viewLocationDescription, viewCrimeRatingText, viewCrimeDate;
     private LinearLayout l1, l2;
     private static boolean ViewFragmentClicked1 = false;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -70,68 +70,101 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
 
         l1 = (LinearLayout) view_global.findViewById(R.id.layout1);
         l2 = (LinearLayout) view_global.findViewById(R.id.layout2);
-        spinnerReview = (Spinner) view_global.findViewById(R.id.spinnerReview);
-        ArrayAdapter<CharSequence> Radapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.review_array, android.R.layout.simple_spinner_item);
-        Radapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerReview.setAdapter(Radapter);
-
-        buttonReviewCrime = (Button) view_global.findViewById(R.id.buttonReviewCrime);
+        buttonReviewUp = (Button) view_global.findViewById(R.id.reviewUp);
+        buttonReviewDown = (Button) view_global.findViewById(R.id.reviewDown);
+        viewCrimeIcon = (ImageView) view_global.findViewById(R.id.viewCrimeIcon);
         viewCrimeDescription = (TextView) view_global.findViewById(R.id.viewCrimeDescription);
         viewCrimeType = (TextView) view_global.findViewById(R.id.viewCrimeType);
+        viewCrimeDate = (TextView) view_global.findViewById(R.id.viewCrimeDate);
         viewCrimeDescription.setMovementMethod(new ScrollingMovementMethod());
-        viewCrimeReviews = (TextView) view_global.findViewById(R.id.viewCrimeReviews);
-        viewCrimeReviewText = (TextView) view_global.findViewById(R.id.viewTextReview);
+        viewLocationDescription = (TextView) view_global.findViewById(R.id.viewLocationDescription);
+        viewCrimeRatingText = (TextView) view_global.findViewById(R.id.viewRatingScore);
 
-        buttonReviewCrime.setVisibility(View.GONE);
+        buttonReviewUp.setVisibility(View.GONE);
+        buttonReviewDown.setVisibility(View.GONE);
+        viewCrimeIcon.setVisibility(View.GONE);
+        viewCrimeDate.setVisibility(View.GONE);
         viewCrimeDescription.setVisibility(View.GONE);
         viewCrimeType.setVisibility(View.GONE);
-        viewCrimeReviews.setVisibility(View.GONE);
-        viewCrimeReviewText.setVisibility(View.GONE);
-        spinnerReview.setVisibility(View.GONE);
+        viewLocationDescription.setVisibility(View.GONE);
+        viewCrimeRatingText.setVisibility(View.GONE);
         l1.setVisibility(View.GONE);
         l2.setVisibility(View.GONE);
 
-        buttonReviewCrime.setOnClickListener(new View.OnClickListener() {
+
+        buttonReviewUp.setOnClickListener(new View.OnClickListener() {
             @Override
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             public void onClick(View v) {
                 if (auth.getCurrentUser() != null) {
+                    String thisUser = auth.getCurrentUser().getUid();
                     CrimeInfo crime = mapHandling.getMarkerCrimeInfo(Marker_id);
-                    int starRating = spinnerReview.getSelectedItemPosition() + 1;
-                    String cId = dbHandling.getCrimeKey(crime);
-                    cReviewUpdate = new CrimeReview(cId, auth.getCurrentUser().getUid(), starRating);
                     if (!HasUserAddedReview(crime)) {
-                        crime.toCalcRating = true;
+                        buttonReviewUp.setBackgroundResource(R.drawable.arrow_up_voted);
+                        crime.cRating++;
+                        crime.cReviewUid.add(new CrimeReview(thisUser,true));
                         dbHandling.updateCrime(crime);
-                        dbHandling.addReview(cReviewUpdate);
+                        viewCrimeRatingText.setText("" + crime.cRating);
                         Toast.makeText(context, "Review added!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        crime.toCalcRating = true;
-                        dbHandling.updateCrime(crime);
-                        dbHandling.updateReview(cReviewUpdate);
-                        Toast.makeText(context, "Review updated!", Toast.LENGTH_SHORT).show();
                     }
-                } else {
+                    else{
+                        if(!HasUserUpVoted(crime)){
+                            buttonReviewDown.setBackgroundResource(R.drawable.arrow_down);
+                            crime.cRating++;
+                            int index = getIndexOfReview(crime);
+                            crime.cReviewUid.remove(index);
+                            dbHandling.updateCrime(crime);
+                            viewCrimeRatingText.setText("" + crime.cRating);
+                            Toast.makeText(context, "Review removed!", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(context, "Review unchanged!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                }
+                else{
                     Toast.makeText(context, "Can't add review. Please login first!", Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
+
+        }});
+
+        buttonReviewDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            public void onClick(View v) {
+                if (auth.getCurrentUser() != null) {
+                    String thisUser = auth.getCurrentUser().getUid();
+                    CrimeInfo crime = mapHandling.getMarkerCrimeInfo(Marker_id);
+                    if (!HasUserAddedReview(crime)) {
+                        buttonReviewDown.setBackgroundResource(R.drawable.arrow_down_voted);
+                        crime.cRating--;
+                        crime.cReviewUid.add(new CrimeReview(thisUser,false));
+                        dbHandling.updateCrime(crime);
+                        viewCrimeRatingText.setText("" + crime.cRating);
+                        Toast.makeText(context, "Review added!", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        if(HasUserUpVoted(crime)){
+                            buttonReviewUp.setBackgroundResource(R.drawable.arrow_up);
+                            crime.cRating--;
+                            int index = getIndexOfReview(crime);
+                            crime.cReviewUid.remove(index);
+                            dbHandling.updateCrime(crime);
+                            viewCrimeRatingText.setText("" + crime.cRating);
+                            Toast.makeText(context, "Review removed!", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(context, "Review unchanged!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                }
+                else{
+                    Toast.makeText(context, "Can't add review. Please login first!", Toast.LENGTH_SHORT).show();
+                }
+
+            }});
 
         return view_global;
-    }
-
-    public boolean HasUserAddedReview(CrimeInfo crime) {
-        boolean toReturn = false;
-        String thisUser = auth.getCurrentUser().getUid();
-        String cId = dbHandling.getCrimeKey(crime);
-        for (CrimeReview cReview : MainActivity.reviewList) {
-            if (cReview.uId.equals(thisUser) && cReview.cId.equals(cId)) {
-                toReturn = true;
-                cReviewUpdate.rId = cReview.rId;
-            }
-        }
-        return toReturn;
     }
 
     @Override
@@ -157,6 +190,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
         mapHandling = new MapHandling(viewcMap);
         mapHandling.updateLocation(context, true);
         viewcMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onCameraIdle() {
                 currentCameraPosition = viewcMap.getCameraPosition();
@@ -174,12 +208,14 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
             public void onMapClick(LatLng point) {
                 if (Marker_clicked == true) {
                     Marker_clicked = false;
-                    buttonReviewCrime.setVisibility(View.GONE);
+                    buttonReviewUp.setVisibility(View.GONE);
+                    buttonReviewDown.setVisibility(View.GONE);
+                    viewCrimeIcon.setVisibility(View.GONE);
                     viewCrimeDescription.setVisibility(View.GONE);
                     viewCrimeType.setVisibility(View.GONE);
-                    viewCrimeReviews.setVisibility(View.GONE);
-                    viewCrimeReviewText.setVisibility(View.GONE);
-                    spinnerReview.setVisibility(View.GONE);
+                    viewLocationDescription.setVisibility(View.GONE);
+                    viewCrimeRatingText.setVisibility(View.GONE);
+                    viewCrimeDate.setVisibility(View.GONE);
                     l1.setVisibility(View.GONE);
                     l2.setVisibility(View.GONE);
                 }
@@ -195,33 +231,62 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
                         Marker_clicked = false;
 
                     if (Marker_clicked == false) {
-                        dbHandling.crimeRatingCalc();
                         Marker_id = arg0.getId();
                         CrimeInfo crime = mapHandling.getMarkerCrimeInfo(Marker_id);
+
+                        if (auth.getCurrentUser() != null) {
+                            if (HasUserAddedReview(crime)) {
+                                if (HasUserUpVoted(crime)) {
+                                    buttonReviewUp.setBackgroundResource(R.drawable.arrow_up_voted);
+                                    //buttonReviewUp.setBackgroundResource(R.drawable.arrow_up);
+                                    buttonReviewDown.setBackgroundResource(R.drawable.arrow_down);
+                                } else {
+                                    buttonReviewDown.setBackgroundResource(R.drawable.arrow_down_voted);
+                                    buttonReviewUp.setBackgroundResource(R.drawable.arrow_up);
+                                    //buttonReviewDown.setBackgroundResource(R.drawable.arrow_down);
+                                }
+                            }
+                            else{
+                                buttonReviewUp.setBackgroundResource(R.drawable.arrow_up);
+                                buttonReviewDown.setBackgroundResource(R.drawable.arrow_down);
+                            }
+                        }
+                         else{
+                                buttonReviewUp.setBackgroundResource(R.drawable.arrow_up);
+                                buttonReviewDown.setBackgroundResource(R.drawable.arrow_down);
+                            }
                         String title = "Crime type: " + crime.cType;
                         SpannableString content = new SpannableString(title);
                         content.setSpan(new UnderlineSpan(), 0, title.length(), 0);
+                        int drawable_id = crime.getCrimeDrawableID(context, crime.cType, "icon");
+                        viewCrimeIcon.setBackgroundResource(drawable_id);
                         viewCrimeType.setText(content);
+                        viewCrimeDate.setText("Crime added on "+ crime.cDate);
                         viewCrimeDescription.setText("Crime description: " + crime.cDescr);
-                        viewCrimeReviews.setText("Average Rating: " + crime.cRating + " Stars");
+                        viewLocationDescription.setText("Location description: " + crime.lDescr);
+                        viewCrimeRatingText.setText(""+crime.cRating);
 
-                        buttonReviewCrime.setVisibility(View.VISIBLE);
+                        buttonReviewUp.setVisibility(View.VISIBLE);
+                        buttonReviewDown.setVisibility(View.VISIBLE);
+                        viewCrimeIcon.setVisibility(View.VISIBLE);
                         viewCrimeDescription.setVisibility(View.VISIBLE);
                         viewCrimeType.setVisibility(View.VISIBLE);
-                        viewCrimeReviews.setVisibility(View.VISIBLE);
-                        viewCrimeReviewText.setVisibility(View.VISIBLE);
-                        spinnerReview.setVisibility(View.VISIBLE);
+                        viewLocationDescription.setVisibility(View.VISIBLE);
+                        viewCrimeRatingText.setVisibility(View.VISIBLE);
+                        viewCrimeDate.setVisibility(View.VISIBLE);
                         l1.setVisibility(View.VISIBLE);
                         l2.setVisibility(View.VISIBLE);
 
                         Marker_clicked = true;
                     } else {
-                        buttonReviewCrime.setVisibility(View.GONE);
+                        buttonReviewUp.setVisibility(View.GONE);
+                        buttonReviewDown.setVisibility(View.GONE);
+                        viewCrimeIcon.setVisibility(View.GONE);
                         viewCrimeDescription.setVisibility(View.GONE);
                         viewCrimeType.setVisibility(View.GONE);
-                        viewCrimeReviews.setVisibility(View.GONE);
-                        viewCrimeReviewText.setVisibility(View.GONE);
-                        spinnerReview.setVisibility(View.GONE);
+                        viewLocationDescription.setVisibility(View.GONE);
+                        viewCrimeRatingText.setVisibility(View.GONE);
+                        viewCrimeDate.setVisibility(View.GONE);
                         l1.setVisibility(View.GONE);
                         l2.setVisibility(View.GONE);
                         Marker_clicked = false;
@@ -232,6 +297,41 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
         });
 
 
+    }
+    public int getIndexOfReview(CrimeInfo crime){
+        int index = -1;
+        String thisUser = auth.getCurrentUser().getUid();
+
+        for (int i=0;i<crime.cReviewUid.size();i++) {
+            if (crime.cReviewUid.get(i).uId.equals(thisUser)) {
+                index = i;
+            }
+        }
+        return index;
+
+    }
+    public boolean HasUserAddedReview(CrimeInfo crime) {
+        boolean toReturn = false;
+        String thisUser = auth.getCurrentUser().getUid();
+        for (CrimeReview cReview : crime.cReviewUid) {
+            if (cReview.uId.equals(thisUser)) {
+                toReturn = true;
+
+            }
+        }
+        return toReturn;
+    }
+
+    public boolean HasUserUpVoted(CrimeInfo crime) {
+        boolean toReturn = false;
+        String thisUser = auth.getCurrentUser().getUid();
+        for (CrimeReview cReview : crime.cReviewUid) {
+            if (cReview.uId.equals(thisUser) && cReview.HasUpVoted == true) {
+                toReturn = true;
+
+            }
+        }
+        return toReturn;
     }
 
     @Override

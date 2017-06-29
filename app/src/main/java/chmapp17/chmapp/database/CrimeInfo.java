@@ -2,13 +2,16 @@ package chmapp17.chmapp.database;
 
 import android.content.Context;
 
+import java.sql.Struct;
+import java.util.ArrayList;
+
 import chmapp17.chmapp.R;
 
 public class CrimeInfo {
 
     public String cType, cDate, cDescr, lDescr, cLocation, uId;
-    public float cRating = 0;
-    public boolean toCalcRating = false;
+    public ArrayList<CrimeReview> cReviewUid = new ArrayList<CrimeReview>();
+    public int cRating = 0;
 
     public CrimeInfo() {
         // Default constructor required for calls to DataSnapshot.getValue(CrimeInfo.class)

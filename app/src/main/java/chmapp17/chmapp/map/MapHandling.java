@@ -93,6 +93,7 @@ public class MapHandling {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void showCrimes(Context context, boolean resetShownCrimes) {
         if (resetShownCrimes)
             shownCrimesLocations.clear();
