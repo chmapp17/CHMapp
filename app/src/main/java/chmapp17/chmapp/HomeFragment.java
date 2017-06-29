@@ -3,15 +3,21 @@ package chmapp17.chmapp;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +63,8 @@ public class HomeFragment extends Fragment implements
     private Context context;
     static public GoogleSignInOptions gso;
     public ProgressDialog mProgressDialog;
+    static private ImageView img_background;
+    static Bitmap bmp;
     //
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,6 +111,19 @@ public class HomeFragment extends Fragment implements
             });
         } else {
             view = inflater.inflate(R.layout.fragment_home_unsigned, container, false);
+
+            if (bmp == null){
+                DisplayMetrics size = context.getResources().getDisplayMetrics();
+                bmp = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(
+                        getResources(),R.drawable.home_image_unsigned),size.widthPixels,size.heightPixels,true);
+
+            }
+
+                img_background = (ImageView) view.findViewById(R.id.view_img_background);
+                img_background.setImageBitmap(bmp);
+
+
+
             Button emailSignIn = (Button) view.findViewById(R.id.email_sign_in_button);
             Button anonymousSignIn = (Button) view.findViewById(R.id.anoymous_sign_in_button);
 
