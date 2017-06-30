@@ -17,6 +17,36 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <Switch
+            android:id="@+id/autoLocationSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="3dp"
+            android:layout_toStartOf="@+id/myLocationButton"
+            android:text="Auto" />
+
+        <Switch
+            android:id="@+id/crimeHeatSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="70dp"
+            android:layout_alignBaseline="@+id/autoLocationSwitch"
+            android:layout_alignBottom="@+id/autoLocationSwitch"
+            android:layout_alignParentStart="true"
+            android:text="Heat" />
+
+        <ImageButton
+            android:id="@+id/myLocationButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/autoLocationSwitch"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/autoLocationSwitch"
+            android:layout_marginEnd="5dp"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_my_location_black_24dp" />
+
         <LinearLayout
             android:id="@+id/layout1"
             android:layout_width="match_parent"
@@ -61,12 +91,14 @@
                     android:maxLines="3"
                     android:scrollbarStyle="insideOverlay"
                     android:scrollbars = "vertical"/>
+
                 <TextView
                     android:id="@+id/viewLocationDescription"
-                    android:layout_width="321dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minLines="1"
+                    android:padding="4dp"
                     android:maxLines="3"
+                    android:minLines="1"
                     android:scrollbarStyle="insideOverlay"
                     android:scrollbars="vertical"
                     android:text=""
@@ -121,13 +153,13 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1.4"
                     android:layout_gravity="right">
+
                     <ImageView
                         android:id="@+id/viewCrimeIcon"
-                        android:paddingTop="10dp"
-                        android:layout_alignParentRight="true"
-                        android:layout_gravity="center"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_gravity="center" />
                 </RelativeLayout>
 
 

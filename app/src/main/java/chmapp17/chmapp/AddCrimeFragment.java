@@ -8,11 +8,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -44,6 +46,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     private Context context;
     private FirebaseAuth auth;
     private GoogleMap addcMap;
+    private int cityZoom = 10;
     private CameraPosition currentCameraPosition;
     private CameraPosition previousCameraPosition;
     private MapHandling mapHandling;
@@ -75,14 +78,15 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
         final Switch crimeHeatSwitch = (Switch) view.findViewById(R.id.crimeHeatSwitch);
         crimeHeatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             public void onCheckedChanged(CompoundButton cb, boolean on) {
                 addcMap.clear();
                 if (on) {
                     mapHandling.addCrimeHeatOverlay();
                 } else {
                     mapHandling.removeCrimeHeatOverlay();
-                    mapHandling.showCrimes(context, true);
-                    mapHandling.updateLocation(context, false);
+                    mapHandling.showCrimes(true);
+                    mapHandling.updateLocation(false);
                 }
             }
         });
@@ -91,9 +95,9 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
 
             @Override
             public void onClick(View v) {
-                if (crimeHeatSwitch.isChecked() && currentCameraPosition.zoom > 10) {
+                if (crimeHeatSwitch.isChecked() && currentCameraPosition.zoom > cityZoom) {
                     savedZoom = currentCameraPosition.zoom;
-                    addcMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+                    addcMap.animateCamera(CameraUpdateFactory.zoomTo(cityZoom));
                 } else {
                     addcMap.animateCamera(CameraUpdateFactory.zoomTo(savedZoom));
                 }
@@ -104,15 +108,30 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
         myLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mapHandling.updateLocation(context, true);
+                mapHandling.updateLocation(true);
             }
         });
+
+        final ImageView crimeIcon = (ImageView) view.findViewById(R.id.crimeIcon);
 
         final Spinner spinnerCrimes = (Spinner) view.findViewById(R.id.spinnerCrimes);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.crimes_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCrimes.setAdapter(adapter);
+        spinnerCrimes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                int drawable_id = context.getResources().getIdentifier
+                        ("crime" + (pos + 1) + "_" + "icon", "drawable", context.getPackageName());
+                crimeIcon.setBackgroundResource(drawable_id);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         final EditText editDate = (EditText) view.findViewById(R.id.editDate);
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyy @ HH:mm");
@@ -168,24 +187,25 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         addcMap = googleMap;
-        mapHandling = new MapHandling(addcMap);
-        mapHandling.updateLocation(context, true);
+        mapHandling = new MapHandling(context, addcMap);
+        mapHandling.updateLocation(true);
         addcMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             Switch crimeHeatSwitch = (Switch) view.findViewById(R.id.crimeHeatSwitch);
 
             @Override
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             public void onCameraIdle() {
                 currentCameraPosition = addcMap.getCameraPosition();
                 if (!currentCameraPosition.equals(previousCameraPosition) &&
                         currentCameraPosition.zoom != addcMap.getMinZoomLevel()) {
-                    if (currentCameraPosition.zoom <= 10)
+                    if (currentCameraPosition.zoom <= cityZoom)
                         crimeHeatSwitch.setChecked(true);
                     else
                         crimeHeatSwitch.setChecked(false);
                     if (crimeHeatSwitch.isChecked())
                         mapHandling.addCrimeHeatOverlay();
                     else
-                        mapHandling.showCrimes(context, false);
+                        mapHandling.showCrimes(false);
                 }
                 previousCameraPosition = currentCameraPosition;
             }
@@ -195,7 +215,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     protected Runnable autoUpdateLocation = new Runnable() {
         @Override
         public void run() {
-            mapHandling.updateLocation(context, false);
+            mapHandling.updateLocation(false);
         }
     };
 }

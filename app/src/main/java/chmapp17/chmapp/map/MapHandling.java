@@ -36,6 +36,7 @@ import chmapp17.chmapp.geolocation.GeoLocation;
 
 public class MapHandling {
 
+    private Context context;
     private GoogleMap googleMap;
     private TileOverlay crimeHeatOverlay;
     private Location currentLocation;
@@ -44,13 +45,14 @@ public class MapHandling {
     private ArrayList<LatLng> shownCrimesLocations;
     private HashMap<String, Integer> mapMarkersCrimes;
 
-    public MapHandling(GoogleMap googleMap) {
+    public MapHandling(Context context, GoogleMap googleMap) {
+        this.context = context;
         this.googleMap = googleMap;
         shownCrimesLocations = new ArrayList<>();
         mapMarkersCrimes = new HashMap<>();
     }
 
-    public void updateLocation(final Context context, final boolean moveCamera) {
+    public void updateLocation(final boolean moveCamera) {
         if (MainActivity.isNetworkAvailable(context)) {
             final GeoLocation geoLocation = new GeoLocation();
             new AsyncTask<Void, Void, Location>() {
@@ -94,7 +96,7 @@ public class MapHandling {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void showCrimes(Context context, boolean resetShownCrimes) {
+    public void showCrimes(boolean resetShownCrimes) {
         if (resetShownCrimes)
             shownCrimesLocations.clear();
         if (!MainActivity.crimeList.isEmpty()) {

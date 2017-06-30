@@ -2,49 +2,28 @@ package chmapp17.chmapp;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
 
 import chmapp17.chmapp.login.anonymous.AnonymousAuthActivity;
 import chmapp17.chmapp.login.email.LoginActivity;
@@ -65,6 +44,7 @@ public class HomeFragment extends Fragment implements
     public ProgressDialog mProgressDialog;
     static private ImageView img_background;
     static Bitmap bmp;
+
     //
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,13 +57,11 @@ public class HomeFragment extends Fragment implements
             view = inflater.inflate(R.layout.fragment_home_signedin, container, false);
             TextView user_name = (TextView) view.findViewById(R.id.user_name);
             FirebaseUser user = auth.getCurrentUser();
-            if (user.getEmail() == null)
-            {
+            if (user.getEmail() == null) {
                 user_name.setText("Welcome to CHMap: You are logged in as anonymous");
-            }
-            else{
+            } else {
                 user_name.setText("Welcome to CHMap: " + user.getDisplayName() +
-                        "\nYour email is: " + user.getEmail() + "\nProvider: "+ user.getProviders());
+                        "\nYour email is: " + user.getEmail() + "\nProvider: " + user.getProviders());
             }
 
 
@@ -92,7 +70,7 @@ public class HomeFragment extends Fragment implements
                 @Override
                 public void onClick(View v) {
                     auth.signOut();
-                    if (mGoogleApiClient != null){
+                    if (mGoogleApiClient != null) {
                         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                                 new ResultCallback<Status>() {
                                     @Override
@@ -102,8 +80,7 @@ public class HomeFragment extends Fragment implements
                                         fragmentManager.replace(R.id.content, new HomeFragment(), "home").commit();
                                     }
                                 });
-                    }
-                    else{
+                    } else {
                         final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
                         fragmentManager.replace(R.id.content, new HomeFragment(), "home").commit();
                     }
@@ -112,16 +89,15 @@ public class HomeFragment extends Fragment implements
         } else {
             view = inflater.inflate(R.layout.fragment_home_unsigned, container, false);
 
-            if (bmp == null){
+            if (bmp == null) {
                 DisplayMetrics size = context.getResources().getDisplayMetrics();
                 bmp = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(
-                        getResources(),R.drawable.home_image_unsigned),size.widthPixels,size.heightPixels,true);
+                        getResources(), R.drawable.home_image_unsigned), size.widthPixels, size.heightPixels, true);
 
             }
 
-                img_background = (ImageView) view.findViewById(R.id.view_img_background);
-                img_background.setImageBitmap(bmp);
-
+            img_background = (ImageView) view.findViewById(R.id.view_img_background);
+            img_background.setImageBitmap(bmp);
 
 
             Button emailSignIn = (Button) view.findViewById(R.id.email_sign_in_button);
@@ -134,7 +110,6 @@ public class HomeFragment extends Fragment implements
                     fragmentManager.replace(R.id.content, new LoginActivity(), "LoginWithEmail").commit();
                 }
             });
-
 
 
             view.findViewById(R.id.gmail_sign_in).setOnClickListener(new View.OnClickListener() {

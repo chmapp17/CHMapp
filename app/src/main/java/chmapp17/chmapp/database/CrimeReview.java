@@ -2,13 +2,13 @@ package chmapp17.chmapp.database;
 
 public class CrimeReview {
     public String uId;
-    public boolean HasUpVoted = false;
+    public boolean hasUpVoted = false;
 
     public CrimeReview() {
     }
 
-    public CrimeReview(String uId, boolean HasUpVoted) {
+    public CrimeReview(String uId, boolean hasUpVoted) {
         this.uId = uId;
-        this.HasUpVoted = HasUpVoted;
+        this.hasUpVoted = hasUpVoted;
     }
 }
