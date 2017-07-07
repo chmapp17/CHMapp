@@ -55,12 +55,12 @@ public class HomeFragment extends Fragment implements
         if (auth.getCurrentUser() != null) {
             //do view
             view = inflater.inflate(R.layout.fragment_home_signedin, container, false);
-            TextView user_name = (TextView) view.findViewById(R.id.user_name);
+            TextView user_details = (TextView) view.findViewById(R.id.user_details);
             FirebaseUser user = auth.getCurrentUser();
             if (user.getEmail() == null) {
-                user_name.setText("Welcome to CHMap: You are logged in as anonymous");
+                user_details.setText("Welcome to CHMap: You are logged in as anonymous");
             } else {
-                user_name.setText("Welcome to CHMap: " + user.getDisplayName() +
+                user_details.setText("Welcome to CHMap: " + user.getDisplayName() +
                         "\nYour email is: " + user.getEmail() + "\nProvider: " + user.getProviders());
             }
 
@@ -112,7 +112,7 @@ public class HomeFragment extends Fragment implements
             });
 
 
-            view.findViewById(R.id.gmail_sign_in).setOnClickListener(new View.OnClickListener() {
+            view.findViewById(R.id.gmail_sign_in_button).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();

@@ -46,9 +46,6 @@ public class LoginActivity extends Fragment {
             fragmentManager.replace(R.id.content, new HomeFragment(), "home").commit();
         }
 
-        //Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        //((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-
         inputEmail = (EditText) view.findViewById(R.id.email);
         inputPassword = (EditText) view.findViewById(R.id.password);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);

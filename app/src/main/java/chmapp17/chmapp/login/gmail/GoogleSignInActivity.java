@@ -85,7 +85,6 @@ public class GoogleSignInActivity extends Fragment implements
             HomeFragment.mGoogleApiClient = mGoogleApiClient;
         }
 
-        Toast.makeText(context, "SignIn", Toast.LENGTH_SHORT).show();
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }

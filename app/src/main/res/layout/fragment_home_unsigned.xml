@@ -17,35 +17,39 @@
             android:layout_alignParentBottom="true"
             android:gravity="bottom"
             android:orientation="horizontal">
+
             <Button
-                android:padding="10dp"
-                style="@style/Widget.AppCompat.Button.Colored"
                 android:id="@+id/email_sign_in_button"
-                android:layout_weight="1"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
                 android:layout_marginTop="16dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/bg_signin"
+                android:padding="10dp"
                 android:text="Sign In with Email"
-                android:textColor="@color/colorPrimaryDark" />
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="16sp" />
 
             <com.google.android.gms.common.SignInButton
-                android:id="@+id/gmail_sign_in"
+                android:id="@+id/gmail_sign_in_button"
                 android:layout_width="0dp"
-                android:layout_weight="1"
-                android:textSize="16sp"
                 android:layout_height="wrap_content"
-                />
-            <Button
-                android:padding="10dp"
                 android:layout_weight="1"
-                style="@style/Widget.AppCompat.Button.Colored"
+                android:paddingBottom="20dp"
+                android:textSize="16sp" />
+
+            <Button
                 android:id="@+id/anoymous_sign_in_button"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:textSize="16sp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/bg_signin"
+                android:padding="10dp"
+                android:text="Sign In Anonymous"
                 android:textColor="@color/colorPrimaryDark"
-                android:text="Sign In Anonymous" />
+                android:textSize="16sp" />
         </LinearLayout>
 </RelativeLayout>
