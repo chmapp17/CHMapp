@@ -3,8 +3,6 @@ package chmapp17.chmapp;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.text.SpannableString;
@@ -22,8 +20,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -42,43 +38,36 @@ import chmapp17.chmapp.database.CrimeReview;
 import chmapp17.chmapp.database.DataBaseHandling;
 import chmapp17.chmapp.map.MapHandling;
 
-public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        GoogleMap.OnMarkerDragListener,
-        GoogleMap.OnMapLongClickListener,
-        View.OnClickListener {
+public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback {
 
+    private View view;
     private Context context;
     private FirebaseAuth auth;
     private GoogleMap viewcMap;
-    private int cityZoom = 10;
+    private int cityZoom = 12;
     private CameraPosition currentCameraPosition;
     private CameraPosition previousCameraPosition;
     private MapHandling mapHandling;
     private DataBaseHandling dbHandling;
     private ScheduledExecutorService scheduleUpdateLocation;
-    private View view_global;
+
     private boolean Marker_clicked = false;
     private String Marker_id = "";
-    private CrimeReview cReviewUpdate;
-    //Buttons
+    private LinearLayout l1, l2;
     private Button buttonReviewUp, buttonReviewDown;
     private ImageView viewCrimeIcon;
-    private TextView viewCrimeDescription, viewCrimeType, viewLocationDescription, viewCrimeRatingText, viewCrimeDate;
-    private LinearLayout l1, l2;
-    private static boolean ViewFragmentClicked1 = false;
+    private TextView viewCrimeDescription, viewCrimeType,
+            viewLocationDescription, viewCrimeRatingText, viewCrimeDate;
 
     @Override
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_view_crimes, container, false);
         context = getContext();
-        view_global = inflater.inflate(R.layout.fragment_view_crimes, container, false);
         dbHandling = new DataBaseHandling();
         auth = FirebaseAuth.getInstance();
 
-        Switch autoLocationSwitch = (Switch) view_global.findViewById(R.id.autoLocationSwitch);
+        Switch autoLocationSwitch = (Switch) view.findViewById(R.id.autoLocationSwitch);
         autoLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton cb, boolean on) {
@@ -93,7 +82,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
             }
         });
 
-        final Switch crimeHeatSwitch = (Switch) view_global.findViewById(R.id.crimeHeatSwitch);
+        final Switch crimeHeatSwitch = (Switch) view.findViewById(R.id.crimeHeatSwitch);
         crimeHeatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -122,7 +111,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
             }
         });
 
-        ImageButton myLocationButton = (ImageButton) view_global.findViewById(R.id.myLocationButton);
+        ImageButton myLocationButton = (ImageButton) view.findViewById(R.id.myLocationButton);
         myLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,17 +119,17 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
             }
         });
 
-        l1 = (LinearLayout) view_global.findViewById(R.id.layout1);
-        l2 = (LinearLayout) view_global.findViewById(R.id.layout2);
-        buttonReviewUp = (Button) view_global.findViewById(R.id.reviewUp);
-        buttonReviewDown = (Button) view_global.findViewById(R.id.reviewDown);
-        viewCrimeIcon = (ImageView) view_global.findViewById(R.id.viewCrimeIcon);
-        viewCrimeDescription = (TextView) view_global.findViewById(R.id.viewCrimeDescription);
-        viewCrimeType = (TextView) view_global.findViewById(R.id.viewCrimeType);
-        viewCrimeDate = (TextView) view_global.findViewById(R.id.viewCrimeDate);
+        l1 = (LinearLayout) view.findViewById(R.id.layout1);
+        l2 = (LinearLayout) view.findViewById(R.id.layout2);
+        buttonReviewUp = (Button) view.findViewById(R.id.reviewUp);
+        buttonReviewDown = (Button) view.findViewById(R.id.reviewDown);
+        viewCrimeIcon = (ImageView) view.findViewById(R.id.viewCrimeIcon);
+        viewCrimeDescription = (TextView) view.findViewById(R.id.viewCrimeDescription);
+        viewCrimeType = (TextView) view.findViewById(R.id.viewCrimeType);
+        viewCrimeDate = (TextView) view.findViewById(R.id.viewCrimeDate);
         viewCrimeDescription.setMovementMethod(new ScrollingMovementMethod());
-        viewLocationDescription = (TextView) view_global.findViewById(R.id.viewLocationDescription);
-        viewCrimeRatingText = (TextView) view_global.findViewById(R.id.viewRatingScore);
+        viewLocationDescription = (TextView) view.findViewById(R.id.viewLocationDescription);
+        viewCrimeRatingText = (TextView) view.findViewById(R.id.viewRatingScore);
 
         buttonReviewUp.setVisibility(View.GONE);
         buttonReviewDown.setVisibility(View.GONE);
@@ -161,7 +150,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
                 if (auth.getCurrentUser() != null) {
                     String thisUser = auth.getCurrentUser().getUid();
                     CrimeInfo crime = mapHandling.getMarkerCrimeInfo(Marker_id);
-                    if (!HasUserAddedReview(crime)) {
+                    if (!hasUserAddedReview(crime)) {
                         buttonReviewUp.setBackgroundResource(R.drawable.arrow_up_voted);
                         crime.cRating++;
                         crime.cReviews.add(new CrimeReview(thisUser, true));
@@ -169,7 +158,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
                         viewCrimeRatingText.setText(String.valueOf(crime.cRating));
                         Toast.makeText(context, "Review added!", Toast.LENGTH_SHORT).show();
                     } else {
-                        if (!HasUserUpVoted(crime)) {
+                        if (!hasUserUpVoted(crime)) {
                             buttonReviewDown.setBackgroundResource(R.drawable.arrow_down);
                             crime.cRating++;
                             int index = getIndexOfReview(crime);
@@ -196,7 +185,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
                 if (auth.getCurrentUser() != null) {
                     String thisUser = auth.getCurrentUser().getUid();
                     CrimeInfo crime = mapHandling.getMarkerCrimeInfo(Marker_id);
-                    if (!HasUserAddedReview(crime)) {
+                    if (!hasUserAddedReview(crime)) {
                         buttonReviewDown.setBackgroundResource(R.drawable.arrow_down_voted);
                         crime.cRating--;
                         crime.cReviews.add(new CrimeReview(thisUser, false));
@@ -204,7 +193,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
                         viewCrimeRatingText.setText(String.valueOf(crime.cRating));
                         Toast.makeText(context, "Review added!", Toast.LENGTH_SHORT).show();
                     } else {
-                        if (HasUserUpVoted(crime)) {
+                        if (hasUserUpVoted(crime)) {
                             buttonReviewUp.setBackgroundResource(R.drawable.arrow_up);
                             crime.cRating--;
                             int index = getIndexOfReview(crime);
@@ -224,7 +213,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
             }
         });
 
-        return view_global;
+        return view;
     }
 
     @Override
@@ -242,29 +231,13 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
             scheduleUpdateLocation.shutdown();
     }
 
-    protected Runnable autoUpdateLocation = new Runnable() {
-        @Override
-        public void run() {
-            mapHandling.updateLocation(false);
-        }
-    };
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         viewcMap = googleMap;
         mapHandling = new MapHandling(context, viewcMap);
         mapHandling.updateLocation(true);
         viewcMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
-            Switch crimeHeatSwitch = (Switch) view_global.findViewById(R.id.crimeHeatSwitch);
+            Switch crimeHeatSwitch = (Switch) view.findViewById(R.id.crimeHeatSwitch);
 
             @Override
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -289,7 +262,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
 
             @Override
             public void onMapClick(LatLng point) {
-                if (Marker_clicked == true) {
+                if (Marker_clicked) {
                     Marker_clicked = false;
                     buttonReviewUp.setVisibility(View.GONE);
                     buttonReviewDown.setVisibility(View.GONE);
@@ -313,13 +286,13 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
                     if (!Marker_id.contentEquals(arg0.getId()))
                         Marker_clicked = false;
 
-                    if (Marker_clicked == false) {
+                    if (!Marker_clicked) {
                         Marker_id = arg0.getId();
                         CrimeInfo crime = mapHandling.getMarkerCrimeInfo(Marker_id);
 
                         if (auth.getCurrentUser() != null) {
-                            if (HasUserAddedReview(crime)) {
-                                if (HasUserUpVoted(crime)) {
+                            if (hasUserAddedReview(crime)) {
+                                if (hasUserUpVoted(crime)) {
                                     buttonReviewUp.setBackgroundResource(R.drawable.arrow_up_voted);
                                     //buttonReviewUp.setBackgroundResource(R.drawable.arrow_up);
                                     buttonReviewDown.setBackgroundResource(R.drawable.arrow_down);
@@ -380,7 +353,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    public int getIndexOfReview(CrimeInfo crime) {
+    private int getIndexOfReview(CrimeInfo crime) {
         int index = -1;
         String thisUser = auth.getCurrentUser().getUid();
 
@@ -393,7 +366,7 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    public boolean HasUserAddedReview(CrimeInfo crime) {
+    private boolean hasUserAddedReview(CrimeInfo crime) {
         boolean toReturn = false;
         String thisUser = auth.getCurrentUser().getUid();
         for (CrimeReview cReview : crime.cReviews) {
@@ -405,11 +378,11 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
         return toReturn;
     }
 
-    public boolean HasUserUpVoted(CrimeInfo crime) {
+    private boolean hasUserUpVoted(CrimeInfo crime) {
         boolean toReturn = false;
         String thisUser = auth.getCurrentUser().getUid();
         for (CrimeReview cReview : crime.cReviews) {
-            if (cReview.uId.equals(thisUser) && cReview.hasUpVoted == true) {
+            if (cReview.uId.equals(thisUser) && cReview.hasUpVoted) {
                 toReturn = true;
 
             }
@@ -417,43 +390,10 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback,
         return toReturn;
     }
 
-    @Override
-    public void onClick(View v) {
-
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
-    @Override
-    public void onMapLongClick(LatLng latLng) {
-
-    }
-
-    @Override
-    public void onMarkerDragStart(Marker marker) {
-
-    }
-
-    @Override
-    public void onMarkerDrag(Marker marker) {
-
-    }
-
-    @Override
-    public void onMarkerDragEnd(Marker marker) {
-
-    }
+    private Runnable autoUpdateLocation = new Runnable() {
+        @Override
+        public void run() {
+            mapHandling.updateLocation(false);
+        }
+    };
 }

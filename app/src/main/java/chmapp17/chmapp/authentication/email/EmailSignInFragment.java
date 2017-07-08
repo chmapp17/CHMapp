@@ -1,4 +1,4 @@
-package chmapp17.chmapp.login.email;
+package chmapp17.chmapp.authentication.email;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -22,43 +22,34 @@ import com.google.firebase.auth.FirebaseAuth;
 import chmapp17.chmapp.HomeFragment;
 import chmapp17.chmapp.R;
 
-public class LoginActivity extends Fragment {
+public class EmailSignInFragment extends Fragment {
 
-    private EditText inputEmail, inputPassword;
-    private FirebaseAuth auth;
-    private ProgressBar progressBar;
-    private Button btnSignup, btnLogin, btnReset;
     private Context context;
-    private View view;
+    private FirebaseAuth auth;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        view = inflater.inflate(R.layout.activity_login, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_email_signin, container, false);
         context = getContext();
-        //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
-        //to delete this after test
 
         if (auth.getCurrentUser() != null) {
             final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
             fragmentManager.replace(R.id.content, new HomeFragment(), "home").commit();
         }
 
-        inputEmail = (EditText) view.findViewById(R.id.email);
-        inputPassword = (EditText) view.findViewById(R.id.password);
-        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
-        btnSignup = (Button) view.findViewById(R.id.btn_signup);
-        btnLogin = (Button) view.findViewById(R.id.btn_login);
-        btnReset = (Button) view.findViewById(R.id.btn_reset_password);
-
+        final EditText inputEmail = (EditText) view.findViewById(R.id.email);
+        final EditText inputPassword = (EditText) view.findViewById(R.id.password);
+        final ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        Button btnSignup = (Button) view.findViewById(R.id.btn_signup);
+        Button btnLogin = (Button) view.findViewById(R.id.btn_login);
+        Button btnReset = (Button) view.findViewById(R.id.btn_reset_password);
 
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
-                fragmentManager.replace(R.id.content, new SignupActivity(), "SignUp").commit();
+                fragmentManager.replace(R.id.content, new EmailSignUpFragment(), "SignUp").commit();
             }
         });
 
@@ -66,7 +57,7 @@ public class LoginActivity extends Fragment {
             @Override
             public void onClick(View v) {
                 final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
-                fragmentManager.replace(R.id.content, new ResetPasswordActivity(), "ResetPassword").commit();
+                fragmentManager.replace(R.id.content, new ResetPasswordFragment(), "ResetPassword").commit();
             }
         });
 
@@ -87,7 +78,6 @@ public class LoginActivity extends Fragment {
                 }
 
                 progressBar.setVisibility(View.VISIBLE);
-
                 //authenticate user
                 auth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {

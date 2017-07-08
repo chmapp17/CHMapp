@@ -29,7 +29,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import chmapp17.chmapp.database.CrimeInfo;
-import chmapp17.chmapp.database.CrimeReview;
 import chmapp17.chmapp.database.DataBaseHandling;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     public static ArrayList<CrimeInfo> crimeList = new ArrayList<>();
     public static HashMap<Integer, String> mapCrimesKeys = new HashMap<>();
     public static HashMap<String, Integer> mapKeysCrimes = new HashMap<>();
-    public static ArrayList<CrimeReview> reviewList = new ArrayList<>();
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -130,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    protected Runnable scanWiFiNetworks = new Runnable() {
+    private Runnable scanWiFiNetworks = new Runnable() {
         Handler handler = new Handler();
 
         @Override

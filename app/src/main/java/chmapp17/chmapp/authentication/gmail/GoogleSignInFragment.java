@@ -1,4 +1,4 @@
-package chmapp17.chmapp.login.gmail;
+package chmapp17.chmapp.authentication.gmail;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -7,11 +7,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -34,64 +32,47 @@ import chmapp17.chmapp.R;
 /**
  * Demonstrate Firebase Authentication using a Google ID Token.
  */
-public class GoogleSignInActivity extends Fragment implements
-        GoogleApiClient.OnConnectionFailedListener,
-        View.OnClickListener {
+public class GoogleSignInFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener {
 
-    public ProgressDialog mProgressDialog;
-    private static final String TAG = "GoogleActivity";
+    private Context context;
+    private FirebaseAuth auth;
+    private ProgressDialog progressDialog;
+    private GoogleApiClient googleApiClient;
+    private GoogleSignInOptions googleSignInOptions;
     private static final int RC_SIGN_IN = 9001;
 
-    // [START declare_auth]
-    private FirebaseAuth mAuth;
-    // [END declare_auth]
-
-    private GoogleApiClient mGoogleApiClient;
-    private GoogleSignInOptions gso;
-    private TextView mStatusTextView;
-    private TextView mDetailTextView;
-    private View view;
-    private Context context;
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        view = inflater.inflate(R.layout.activity_google, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_google_signin, container, false);
         context = getContext();
+        auth = FirebaseAuth.getInstance();
 
-        gso = HomeFragment.gso;
-        mGoogleApiClient = HomeFragment.mGoogleApiClient;
-        mAuth = FirebaseAuth.getInstance();
+        googleSignInOptions = HomeFragment.googleSignInOptions;
+        googleApiClient = HomeFragment.googleApiClient;
         signIn();
 
         return view;
     }
 
     private void signIn() {
-        if (gso == null) {
-            gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        if (googleSignInOptions == null) {
+            googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken(getString(R.string.web_client_id))
                     .requestEmail()
                     .build();
-            HomeFragment.gso = gso;
+            HomeFragment.googleSignInOptions = googleSignInOptions;
 
         }
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(getContext())
-                    .enableAutoManage(getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(getContext())
+                    .enableAutoManage(getActivity(), this)
+                    .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
                     .build();
-            HomeFragment.mGoogleApiClient = mGoogleApiClient;
+            HomeFragment.googleApiClient = googleApiClient;
         }
 
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -113,23 +94,19 @@ public class GoogleSignInActivity extends Fragment implements
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         showProgressDialog();
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
+        auth.signInWithCredential(credential)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            FirebaseUser user = auth.getCurrentUser();
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Toast.makeText(context, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
                         hideProgressDialog();
                         final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
@@ -140,28 +117,20 @@ public class GoogleSignInActivity extends Fragment implements
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
         Toast.makeText(context, "Google Play Services error.", Toast.LENGTH_SHORT).show();
     }
 
     public void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(context);
-            mProgressDialog.setMessage("Loading..");
-            mProgressDialog.setIndeterminate(true);
-        }
-
-        mProgressDialog.show();
-    }
-
-    public void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.dismiss();
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setMessage("Loading..");
+            progressDialog.setIndeterminate(true);
         }
     }
 
-    @Override
-    public void onClick(View v) {
+    private void hideProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 }

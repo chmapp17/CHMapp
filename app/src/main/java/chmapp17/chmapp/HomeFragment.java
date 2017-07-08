@@ -1,6 +1,5 @@
 package chmapp17.chmapp;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,43 +17,34 @@ import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import chmapp17.chmapp.login.anonymous.AnonymousAuthActivity;
-import chmapp17.chmapp.login.email.LoginActivity;
-import chmapp17.chmapp.login.gmail.GoogleSignInActivity;
+import chmapp17.chmapp.authentication.anonymous.AnonymousSignInFragment;
+import chmapp17.chmapp.authentication.email.EmailSignInFragment;
+import chmapp17.chmapp.authentication.gmail.GoogleSignInFragment;
 
-public class HomeFragment extends Fragment implements
-        GoogleApiClient.OnConnectionFailedListener,
-        View.OnClickListener {
+public class HomeFragment extends Fragment {
 
-    private static final String TAG = "GoogleActivity";
-    private View view;
-    private FirebaseAuth auth;
-    private GoogleSignInActivity gmailSignIn;
-    static public GoogleApiClient mGoogleApiClient;
-    private static final int RC_SIGN_IN = 9001;
     private Context context;
-    static public GoogleSignInOptions gso;
-    public ProgressDialog mProgressDialog;
-    static private ImageView img_background;
-    static Bitmap bmp;
+    private FirebaseAuth auth;
+    private static Bitmap bitmap;
+    public static GoogleApiClient googleApiClient;
+    public static GoogleSignInOptions googleSignInOptions;
 
     //
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view;
         context = getContext();
         auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
-            //do view
-            view = inflater.inflate(R.layout.fragment_home_signedin, container, false);
+            view = inflater.inflate(R.layout.fragment_home_auth, container, false);
+
             TextView user_details = (TextView) view.findViewById(R.id.user_details);
             FirebaseUser user = auth.getCurrentUser();
             if (user.getEmail() == null) {
@@ -64,18 +54,16 @@ public class HomeFragment extends Fragment implements
                         "\nYour email is: " + user.getEmail() + "\nProvider: " + user.getProviders());
             }
 
-
             Button signout = (Button) view.findViewById(R.id.sign_out_button);
             signout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     auth.signOut();
-                    if (mGoogleApiClient != null) {
-                        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                    if (googleApiClient != null) {
+                        Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(
                                 new ResultCallback<Status>() {
                                     @Override
                                     public void onResult(@NonNull Status status) {
-
                                         final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
                                         fragmentManager.replace(R.id.content, new HomeFragment(), "home").commit();
                                     }
@@ -87,36 +75,35 @@ public class HomeFragment extends Fragment implements
                 }
             });
         } else {
-            view = inflater.inflate(R.layout.fragment_home_unsigned, container, false);
+            view = inflater.inflate(R.layout.fragment_home, container, false);
 
-            if (bmp == null) {
+            if (bitmap == null) {
                 DisplayMetrics size = context.getResources().getDisplayMetrics();
-                bmp = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(
-                        getResources(), R.drawable.home_image_unsigned), size.widthPixels, size.heightPixels, true);
+                bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(
+                        getResources(), R.drawable.home_bg_image), size.widthPixels, size.heightPixels, true);
 
             }
 
-            img_background = (ImageView) view.findViewById(R.id.view_img_background);
-            img_background.setImageBitmap(bmp);
-
+            ImageView bg_image = (ImageView) view.findViewById(R.id.bg_image);
+            bg_image.setImageBitmap(bitmap);
 
             Button emailSignIn = (Button) view.findViewById(R.id.email_sign_in_button);
+            SignInButton gmailSignIn = (SignInButton) view.findViewById(R.id.gmail_sign_in_button);
             Button anonymousSignIn = (Button) view.findViewById(R.id.anoymous_sign_in_button);
 
             emailSignIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
-                    fragmentManager.replace(R.id.content, new LoginActivity(), "LoginWithEmail").commit();
+                    fragmentManager.replace(R.id.content, new EmailSignInFragment(), "EmailSignIn").commit();
                 }
             });
 
-
-            view.findViewById(R.id.gmail_sign_in_button).setOnClickListener(new View.OnClickListener() {
+            gmailSignIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
-                    fragmentManager.replace(R.id.content, new GoogleSignInActivity(), "GoogleSignIn").commit();
+                    fragmentManager.replace(R.id.content, new GoogleSignInFragment(), "GoogleSignIn").commit();
                 }
             });
 
@@ -124,10 +111,9 @@ public class HomeFragment extends Fragment implements
                 @Override
                 public void onClick(View v) {
                     final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
-                    fragmentManager.replace(R.id.content, new AnonymousAuthActivity(), "LoginAnonymous").commit();
+                    fragmentManager.replace(R.id.content, new AnonymousSignInFragment(), "AnonymousSignIn").commit();
                 }
             });
-
         }
 
         return view;
@@ -136,16 +122,5 @@ public class HomeFragment extends Fragment implements
     @Override
     public void onStart() {
         super.onStart();
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
-    @Override
-    public void onClick(View v) {
-
     }
 }

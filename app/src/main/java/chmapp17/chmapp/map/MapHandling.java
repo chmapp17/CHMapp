@@ -38,10 +38,10 @@ public class MapHandling {
 
     private Context context;
     private GoogleMap googleMap;
-    private TileOverlay crimeHeatOverlay;
     private Location currentLocation;
     private static Marker bluedotMarker;
     private static Circle accuracyCircle;
+    private static TileOverlay crimeHeatOverlay;
     private ArrayList<LatLng> shownCrimesLocations;
     private HashMap<String, Integer> mapMarkersCrimes;
 
@@ -124,18 +124,17 @@ public class MapHandling {
     }
 
     public void addCrimeHeatOverlay() {
-        ArrayList<LatLng> crimesLatLngs = new ArrayList<>();
         LatLngBounds mapBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
         for (CrimeInfo crime : MainActivity.crimeList) {
             String[] coord = crime.cLocation.replace(",", "").split(" ");
             LatLng crimeLocation
                     = new LatLng(Double.parseDouble(coord[0]), Double.parseDouble(coord[1]));
-            if (mapBounds.contains(crimeLocation))
-                crimesLatLngs.add(crimeLocation);
+            if (mapBounds.contains(crimeLocation) && !shownCrimesLocations.contains(crimeLocation))
+                shownCrimesLocations.add(crimeLocation);
         }
-        if (!crimesLatLngs.isEmpty()) {
+        if (!shownCrimesLocations.isEmpty()) {
             HeatmapTileProvider heatmapProvider
-                    = new HeatmapTileProvider.Builder().data(crimesLatLngs).build();
+                    = new HeatmapTileProvider.Builder().data(shownCrimesLocations).build();
             crimeHeatOverlay = googleMap.addTileOverlay
                     (new TileOverlayOptions().tileProvider(heatmapProvider));
         }

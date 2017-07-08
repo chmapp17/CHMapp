@@ -72,7 +72,7 @@ public class GeoLocation {
                         new InputStreamReader(conn.getInputStream(), "utf-8"));
                 String line;
                 while ((line = br.readLine()) != null) {
-                    sb.append(line + "\n");
+                    sb.append(line).append("\n");
                 }
                 br.close();
                 result = sb.toString();

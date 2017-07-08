@@ -1,4 +1,4 @@
-package chmapp17.chmapp.login.email;
+package chmapp17.chmapp.authentication.email;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -24,38 +24,30 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import chmapp17.chmapp.HomeFragment;
 import chmapp17.chmapp.R;
 
-public class SignupActivity extends Fragment {
+public class EmailSignUpFragment extends Fragment {
 
-    private EditText inputEmail, inputPassword, inputUserName;
-    private Button btnSignIn, btnSignUp, btnResetPassword;
-    private ProgressBar progressBar;
-    private FirebaseAuth auth;
     private Context context;
-    private String user_name, email;
+    private FirebaseAuth auth;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_email_signup, container, false);
         context = getContext();
-        View view = inflater.inflate(R.layout.activity_signup, container, false);
-
-        //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
 
-        btnSignIn = (Button) view.findViewById(R.id.sign_in_button);
-        btnSignUp = (Button) view.findViewById(R.id.sign_up_button);
-        inputUserName = (EditText) view.findViewById(R.id.user);
-        inputEmail = (EditText) view.findViewById(R.id.email);
-        inputPassword = (EditText) view.findViewById(R.id.password);
-        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
-        btnResetPassword = (Button) view.findViewById(R.id.btn_reset_password);
+        final ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        final EditText inputUserName = (EditText) view.findViewById(R.id.user);
+        final EditText inputEmail = (EditText) view.findViewById(R.id.email);
+        final EditText inputPassword = (EditText) view.findViewById(R.id.password);
+        Button btnSignIn = (Button) view.findViewById(R.id.sign_in_button);
+        Button btnSignUp = (Button) view.findViewById(R.id.sign_up_button);
+        Button btnResetPassword = (Button) view.findViewById(R.id.btn_reset_password);
 
         btnResetPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
-                fragmentManager.replace(R.id.content, new ResetPasswordActivity(), "ResetPassword").commit();
+                fragmentManager.replace(R.id.content, new ResetPasswordFragment(), "ResetPassword").commit();
             }
         });
 
@@ -63,46 +55,41 @@ public class SignupActivity extends Fragment {
             @Override
             public void onClick(View v) {
                 final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
-                fragmentManager.replace(R.id.content, new LoginActivity(), "Login").commit();
+                fragmentManager.replace(R.id.content, new EmailSignInFragment(), "Login").commit();
             }
         });
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                user_name = inputUserName.getText().toString().trim();
-                email = inputEmail.getText().toString().trim();
+                String user_name = inputUserName.getText().toString().trim();
+                String email = inputEmail.getText().toString().trim();
                 String password = inputPassword.getText().toString().trim();
 
                 if (TextUtils.isEmpty(user_name)) {
                     Toast.makeText(context, "Enter user name!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(context, "Enter email address!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 if (TextUtils.isEmpty(password)) {
                     Toast.makeText(context, "Enter password!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 if (password.length() < 6) {
-                    Toast.makeText(context, "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Password too short, enter minimum 6 characters!",
+                            Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 progressBar.setVisibility(View.VISIBLE);
                 //create user
                 auth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                Toast.makeText(context, "createUserWithEmail:onComplete:" +
-                                        task.isSuccessful(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Utilizator creat.", Toast.LENGTH_SHORT).show();
                                 progressBar.setVisibility(View.GONE);
                                 // If sign in fails, display a message to the user. If sign in succeeds
                                 // the auth state listener will be notified and logic to handle the
@@ -121,15 +108,8 @@ public class SignupActivity extends Fragment {
                                 }
                             }
                         });
-
             }
         });
         return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        progressBar.setVisibility(View.GONE);
     }
 }

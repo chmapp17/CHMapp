@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 interface DataBooleanChangedListener {
-    public void OnMyBooleanChanged();
+    void OnMyBooleanChanged();
 }
 
 public class DataListener {
     private static boolean myBoolean;
-    private static List<DataBooleanChangedListener> listeners = new ArrayList<DataBooleanChangedListener>();
+    private static List<DataBooleanChangedListener> listeners = new ArrayList<>();
 
     public static boolean getMyBoolean() {
         return myBoolean;

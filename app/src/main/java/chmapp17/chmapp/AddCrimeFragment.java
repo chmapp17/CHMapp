@@ -46,7 +46,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
     private Context context;
     private FirebaseAuth auth;
     private GoogleMap addcMap;
-    private int cityZoom = 10;
+    private int cityZoom = 12;
     private CameraPosition currentCameraPosition;
     private CameraPosition previousCameraPosition;
     private MapHandling mapHandling;
@@ -212,7 +212,7 @@ public class AddCrimeFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
-    protected Runnable autoUpdateLocation = new Runnable() {
+    private Runnable autoUpdateLocation = new Runnable() {
         @Override
         public void run() {
             mapHandling.updateLocation(false);

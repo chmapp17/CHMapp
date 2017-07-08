@@ -1,4 +1,4 @@
-package chmapp17.chmapp.login.email;
+package chmapp17.chmapp.authentication.email;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -20,59 +20,50 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import chmapp17.chmapp.R;
 
-public class ResetPasswordActivity extends Fragment {
+public class ResetPasswordFragment extends Fragment {
 
-    private EditText inputEmail;
-    private Button btnReset, btnBack;
-    private FirebaseAuth auth;
-    private ProgressBar progressBar;
-    private View view;
     private Context context;
+    private FirebaseAuth auth;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        view = inflater.inflate(R.layout.activity_reset_password, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_reset_password, container, false);
         context = getContext();
-
-        inputEmail = (EditText) view.findViewById(R.id.email);
-        btnReset = (Button) view.findViewById(R.id.btn_reset_password);
-        btnBack = (Button) view.findViewById(R.id.btn_back);
-        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
-
         auth = FirebaseAuth.getInstance();
+
+        final ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        final EditText inputEmail = (EditText) view.findViewById(R.id.email);
+        Button btnReset = (Button) view.findViewById(R.id.btn_reset_password);
+        Button btnBack = (Button) view.findViewById(R.id.btn_back);
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final FragmentTransaction fragmentManager = getFragmentManager().beginTransaction();
-                fragmentManager.replace(R.id.content, new LoginActivity(), "Login").commit();
+                fragmentManager.replace(R.id.content, new EmailSignInFragment(), "Login").commit();
             }
         });
 
         btnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 String email = inputEmail.getText().toString().trim();
 
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(context, "Enter your registered email id", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 progressBar.setVisibility(View.VISIBLE);
                 auth.sendPasswordResetEmail(email)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(context, "We have sent you instructions to reset your password!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "We have sent you instructions to reset your password!",
+                                            Toast.LENGTH_SHORT).show();
                                 } else {
                                     Toast.makeText(context, "Failed to send reset email!", Toast.LENGTH_SHORT).show();
                                 }
-
                                 progressBar.setVisibility(View.GONE);
                             }
                         });
@@ -80,5 +71,4 @@ public class ResetPasswordActivity extends Fragment {
         });
         return view;
     }
-
 }
