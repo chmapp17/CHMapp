@@ -149,28 +149,64 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback {
             public void onClick(View v) {
                 if (auth.getCurrentUser() != null) {
                     String thisUser = auth.getCurrentUser().getUid();
+                    String thisEmail = auth.getCurrentUser().getEmail();
                     CrimeInfo crime = mapHandling.getMarkerCrimeInfo(Marker_id);
-                    if (!hasUserAddedReview(crime)) {
-                        buttonReviewUp.setBackgroundResource(R.drawable.arrow_up_voted);
-                        crime.cRating++;
-                        crime.cReviews.add(new CrimeReview(thisUser, true));
-                        dbHandling.updateCrime(crime);
-                        viewCrimeRatingText.setText(String.valueOf(crime.cRating));
-                        Toast.makeText(context, "Review added!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        if (!hasUserUpVoted(crime)) {
-                            buttonReviewDown.setBackgroundResource(R.drawable.arrow_down);
-                            crime.cRating++;
-                            int index = getIndexOfReview(crime);
-                            crime.cReviews.remove(index);
-                            dbHandling.updateCrime(crime);
-                            viewCrimeRatingText.setText(String.valueOf(crime.cRating));
-                            Toast.makeText(context, "Review removed!", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(context, "Review unchanged!", Toast.LENGTH_SHORT).show();
-                        }
-                    }
+                        if (!hasUserAddedReview(crime)) {
+                            if (thisEmail == null) {
+                                if (canAddReview(crime) == true)
+                                {
+                                    buttonReviewUp.setBackgroundResource(R.drawable.arrow_up_voted);
+                                    crime.cRating++;
+                                    crime.cReviews.add(new CrimeReview(thisUser, thisEmail, true));
+                                    dbHandling.updateCrime(crime);
+                                    viewCrimeRatingText.setText(String.valueOf(crime.cRating));
+                                    Toast.makeText(context, "Review added!", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Toast.makeText(context, "Anonymous users can't add any more reviews. \n" +
+                                            "Please login with credentials to vote for this crime! ", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                                else{
 
+                                if (thisEmail.equals("")) {
+                                    if (canAddReview(crime) == true) {
+                                        buttonReviewUp.setBackgroundResource(R.drawable.arrow_up_voted);
+                                        crime.cRating++;
+                                        crime.cReviews.add(new CrimeReview(thisUser, thisEmail, true));
+                                        dbHandling.updateCrime(crime);
+                                        viewCrimeRatingText.setText(String.valueOf(crime.cRating));
+                                        Toast.makeText(context, "Review added!", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(context, "Anonymous users can't add any more reviews. \n" +
+                                                "Please login with credentials to vote for this crime! ", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                    else{
+
+                                        buttonReviewUp.setBackgroundResource(R.drawable.arrow_up_voted);
+                                        crime.cRating++;
+                                        crime.cReviews.add(new CrimeReview(thisUser, thisEmail, true));
+                                        dbHandling.updateCrime(crime);
+                                        viewCrimeRatingText.setText(String.valueOf(crime.cRating));
+                                        Toast.makeText(context, "Review added!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                        } else {
+                            if (!hasUserUpVoted(crime)) {
+                                buttonReviewDown.setBackgroundResource(R.drawable.arrow_down);
+                                crime.cRating++;
+                                int index = getIndexOfReview(crime);
+                                crime.cReviews.remove(index);
+                                dbHandling.updateCrime(crime);
+                                viewCrimeRatingText.setText(String.valueOf(crime.cRating));
+                                Toast.makeText(context, "Review removed!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(context, "Review unchanged!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
                 } else {
                     Toast.makeText(context, "Can't add review. Please login first!", Toast.LENGTH_SHORT).show();
                 }
@@ -184,31 +220,62 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback {
             public void onClick(View v) {
                 if (auth.getCurrentUser() != null) {
                     String thisUser = auth.getCurrentUser().getUid();
+                    String thisEmail = auth.getCurrentUser().getEmail();
                     CrimeInfo crime = mapHandling.getMarkerCrimeInfo(Marker_id);
-                    if (!hasUserAddedReview(crime)) {
-                        buttonReviewDown.setBackgroundResource(R.drawable.arrow_down_voted);
-                        crime.cRating--;
-                        crime.cReviews.add(new CrimeReview(thisUser, false));
-                        dbHandling.updateCrime(crime);
-                        viewCrimeRatingText.setText(String.valueOf(crime.cRating));
-                        Toast.makeText(context, "Review added!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        if (hasUserUpVoted(crime)) {
-                            buttonReviewUp.setBackgroundResource(R.drawable.arrow_up);
-                            crime.cRating--;
-                            int index = getIndexOfReview(crime);
-                            crime.cReviews.remove(index);
-                            dbHandling.updateCrime(crime);
-                            viewCrimeRatingText.setText(String.valueOf(crime.cRating));
-                            Toast.makeText(context, "Review removed!", Toast.LENGTH_SHORT).show();
+
+
+                        if (!hasUserAddedReview(crime)) {
+                            if (thisEmail == null) {
+                                if (canAddReview(crime) == true) {
+                                    buttonReviewDown.setBackgroundResource(R.drawable.arrow_down_voted);
+                                    crime.cRating--;
+                                    crime.cReviews.add(new CrimeReview(thisUser, thisEmail, false));
+                                    dbHandling.updateCrime(crime);
+                                    viewCrimeRatingText.setText(String.valueOf(crime.cRating));
+                                    Toast.makeText(context, "Review added!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(context, "Anonymous users can't add any more reviews. \n" +
+                                            "Please login with credentials to vote for this crime! ", Toast.LENGTH_SHORT).show();
+                                }}
+                            else {
+                                if (thisEmail == null) {
+                                    if (canAddReview(crime) == true) {
+                                        buttonReviewDown.setBackgroundResource(R.drawable.arrow_down_voted);
+                                        crime.cRating--;
+                                        crime.cReviews.add(new CrimeReview(thisUser, thisEmail, false));
+                                        dbHandling.updateCrime(crime);
+                                        viewCrimeRatingText.setText(String.valueOf(crime.cRating));
+                                        Toast.makeText(context, "Review added!", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(context, "Anonymous users can't add any more reviews. \n" +
+                                                "Please login with credentials to vote for this crime! ", Toast.LENGTH_SHORT).show();
+                                    }}
+                                else {
+                                    buttonReviewDown.setBackgroundResource(R.drawable.arrow_down_voted);
+                                    crime.cRating--;
+                                    crime.cReviews.add(new CrimeReview(thisUser, thisEmail, false));
+                                    dbHandling.updateCrime(crime);
+                                    viewCrimeRatingText.setText(String.valueOf(crime.cRating));
+                                    Toast.makeText(context, "Review added!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
                         } else {
-                            Toast.makeText(context, "Review unchanged!", Toast.LENGTH_SHORT).show();
-                        }
+                            if (hasUserUpVoted(crime)) {
+                                buttonReviewUp.setBackgroundResource(R.drawable.arrow_up);
+                                crime.cRating--;
+                                int index = getIndexOfReview(crime);
+                                crime.cReviews.remove(index);
+                                dbHandling.updateCrime(crime);
+                                viewCrimeRatingText.setText(String.valueOf(crime.cRating));
+                                Toast.makeText(context, "Review removed!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(context, "Review unchanged!", Toast.LENGTH_SHORT).show();
+                            }
+
+                    }} else{
+                        Toast.makeText(context, "Can't add review. Please login first!", Toast.LENGTH_SHORT).show();
                     }
 
-                } else {
-                    Toast.makeText(context, "Can't add review. Please login first!", Toast.LENGTH_SHORT).show();
-                }
 
             }
         });
@@ -372,9 +439,28 @@ public class ViewCrimesFragment extends Fragment implements OnMapReadyCallback {
         for (CrimeReview cReview : crime.cReviews) {
             if (cReview.uId.equals(thisUser)) {
                 toReturn = true;
-
             }
         }
+        return toReturn;
+    }
+    private boolean canAddReview(CrimeInfo crime) {
+        boolean toReturn = false;
+        int anonymous_votes = 0;
+        if (crime.cReviews.size() != 0) {
+            for (CrimeReview cReview : crime.cReviews) {
+                if (cReview.email.equals("")) {
+                    anonymous_votes++;
+                }
+
+            }
+            int votes = crime.cReviews.size();
+            if ((anonymous_votes * 100) / votes > 10) {
+                toReturn = false;
+            } else {
+                toReturn = true;
+            }
+        }
+        else {toReturn = true;}
         return toReturn;
     }
 

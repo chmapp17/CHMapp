@@ -33,6 +33,7 @@ public class HomeFragment extends Fragment {
     private Context context;
     private FirebaseAuth auth;
     private static Bitmap bitmap;
+    private static Bitmap bitmap_auth;
     public static GoogleApiClient googleApiClient;
     public static GoogleSignInOptions googleSignInOptions;
 
@@ -45,13 +46,28 @@ public class HomeFragment extends Fragment {
         if (auth.getCurrentUser() != null) {
             view = inflater.inflate(R.layout.fragment_home_auth, container, false);
 
+            if (bitmap == null) {
+                DisplayMetrics size = context.getResources().getDisplayMetrics();
+                bitmap_auth = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(
+                        getResources(), R.drawable.home_auth), size.widthPixels, size.heightPixels, true);
+            }
+            ImageView bg_image = (ImageView) view.findViewById(R.id.imageView);
+            bg_image.setImageBitmap(bitmap_auth);
+
             TextView user_details = (TextView) view.findViewById(R.id.user_details);
             FirebaseUser user = auth.getCurrentUser();
             if (user.getEmail() == null) {
-                user_details.setText("Welcome to CHMap: You are logged in as anonymous");
+                user_details.setText("You are logged in as anonymous!");
             } else {
-                user_details.setText("Welcome to CHMap: " + user.getDisplayName() +
-                        "\nYour email is: " + user.getEmail() + "\nProvider: " + user.getProviders());
+                if (user.getEmail().equals(""))
+                {
+                    user_details.setText("You are logged in as anonymous!");
+                }
+                else{
+                    user_details.setText("CHMapp credentials:\nUser name: " + user.getDisplayName() +
+                            "\nUser email: " + user.getEmail() + "\nProvider: " + user.getProviders());
+                }
+
             }
 
             Button signout = (Button) view.findViewById(R.id.sign_out_button);
